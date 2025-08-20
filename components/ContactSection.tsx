@@ -9,7 +9,7 @@ export default function ContactSection() {
             Get in touch with us!
           </h2>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-            Ready to start your taekwondo journey? Contact us today to learn more about our classes 
+            Ready to start your martial arts journey? Contact us today to learn more about our classes 
             and schedule your first session.
           </p>
         </div>
@@ -21,8 +21,8 @@ export default function ContactSection() {
               <MessageSquare className="w-6 h-6 text-accent-500 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold mb-2">WhatsApp</h3>
-                <a href="https://wa.me/6593882846" className="text-accent-500 hover:text-accent-400 transition-colors">
-                  +65 9388 2846
+                <a href="#" className="text-accent-500 hover:text-accent-400 transition-colors">
+                  +1 (555) 123-4567
                 </a>
               </div>
             </div>
@@ -31,8 +31,8 @@ export default function ContactSection() {
               <Mail className="w-6 h-6 text-accent-500 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold mb-2">Email</h3>
-                <a href="mailto:enquiries.taekwondonomics@gmail.com" className="text-accent-500 hover:text-accent-400 transition-colors">
-                  enquiries.taekwondonomics@gmail.com
+                <a href="mailto:info@martialarts.com" className="text-accent-500 hover:text-accent-400 transition-colors">
+                  info@martialarts.com
                 </a>
               </div>
             </div>
@@ -41,8 +41,8 @@ export default function ContactSection() {
               <Instagram className="w-6 h-6 text-accent-500 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold mb-2">Instagram</h3>
-                <a href="https://instagram.com/taekwondonomics.sg" className="text-accent-500 hover:text-accent-400 transition-colors">
-                  @taekwondonomics.sg
+                <a href="#" className="text-accent-500 hover:text-accent-400 transition-colors">
+                  @martialarts_academy
                 </a>
               </div>
             </div>
@@ -51,8 +51,8 @@ export default function ContactSection() {
               <Facebook className="w-6 h-6 text-accent-500 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold mb-2">Facebook</h3>
-                <a href="https://facebook.com/TaekwondonomicsSg" className="text-accent-500 hover:text-accent-400 transition-colors">
-                  Taekwondonomics Sg
+                <a href="#" className="text-accent-500 hover:text-accent-400 transition-colors">
+                  Martial Arts Academy
                 </a>
               </div>
             </div>
@@ -62,8 +62,8 @@ export default function ContactSection() {
               <div>
                 <h3 className="text-lg font-semibold mb-2">Location</h3>
                 <p className="text-gray-300">
-                  Multiple locations across Singapore<br />
-                  Contact us for the nearest center
+                  123 Main Street<br />
+                  Your City, State 12345
                 </p>
               </div>
             </div>
@@ -136,11 +136,11 @@ export default function ContactSection() {
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white"
                 >
                   <option value="">Select a class</option>
-                  <option value="super-junior">Super Junior (3-5 years)</option>
-                  <option value="kids">Kids (6-12 years)</option>
-                  <option value="teens-adult">Teens/Adult Executive</option>
-                  <option value="pace-challenger">Pace Challenger</option>
-                  <option value="elite-competition">Elite Competition Team</option>
+                  <option value="beginners">Beginners (3-5 years)</option>
+                  <option value="youth">Youth (6-12 years)</option>
+                  <option value="adult">Adult Programs</option>
+                  <option value="intensive">Intensive Training</option>
+                  <option value="competition">Competition Team</option>
                 </select>
               </div>
 

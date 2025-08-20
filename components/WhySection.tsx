@@ -25,39 +25,48 @@ export default function WhySection() {
   ]
 
   return (
-    <section id="why" className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="why" className="py-16 bg-gradient-to-br from-gray-50 via-white to-primary-50 relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full opacity-20"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-100 rounded-full opacity-20"></div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            WHY TAEKWONDONOMICS?
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+            WHY CHOOSE US?
           </h2>
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <p className="text-lg text-gray-700 leading-relaxed">
-              As a <strong>boutique taekwondo studio</strong>, Taekwondonomics is the perfect choice for parents looking for supervised contact sports learning without compromise in quality of trainers and training. <strong>Taekwondo class Singapore</strong> is elevated to new heights with Taekwondonomics, as we are affiliated with the Singapore Taekwondo Federation (National Sports Association for Taekwondo).
+              As a <strong className="text-primary-600">professional martial arts academy</strong>, we are the perfect choice for students looking for supervised training without compromise in quality of instructors and programs. Our <strong className="text-primary-600">martial arts classes</strong> are elevated to new heights through our affiliation with recognized martial arts federations and organizations.
             </p>
             
             <p className="text-lg text-gray-700 leading-relaxed">
-              Equipped with the latest facilities and the <strong>best taekwondo Singapore</strong> has to offer, we pride ourselves on providing the finest coaching and training experiences. Our school is recognized as the <strong>best picked taekwondo school</strong> in Asia, offering trainees the opportunity to experience global <strong>taekwondo training in Singapore</strong> that meets international standards.
+              Equipped with modern facilities and <strong className="text-primary-600">experienced instructors</strong>, we pride ourselves on providing exceptional coaching and training experiences. Our academy is recognized for excellence, offering students the opportunity to experience <strong className="text-primary-600">world-class martial arts training</strong> that meets international standards.
             </p>
 
             <p className="text-lg text-gray-700 leading-relaxed">
-              We are also the only <strong>award-winning taekwondo school</strong> with multiple accolades and mandates from both local and Asia's auditing bodies. Our dedication to quality makes us the go-to for the <strong>best taekwondo classes in Singapore</strong>, where trainees can learn under the guidance of the best in the industry.
+              We are an <strong className="text-accent-600">award-winning martial arts academy</strong> with multiple recognitions from various martial arts organizations. Our dedication to quality makes us the top choice for <strong className="text-accent-600">martial arts education</strong>, where students can learn under the guidance of certified professional instructors.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             {features.map((feature, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-primary-600 mb-4">
+              <div
+                key={index}
+                className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 group hover:scale-105"
+              >
+                <div className="text-primary-600 mb-4 group-hover:text-accent-600 transition-colors group-hover:scale-110 transition-transform duration-200">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-primary-700 transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-sm leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -65,10 +74,13 @@ export default function WhySection() {
           </div>
         </div>
 
-        <div className="mt-12 text-center">
-          <p className="text-lg text-gray-700 leading-relaxed max-w-4xl mx-auto">
-            Whether you're searching for a <strong>taekwondo class Singapore</strong> or want to join a <strong>boutique taekwondo studio</strong>, Taekwondonomics is the name to trust. Experience the difference of learning at the <strong>best taekwondo Singapore</strong> school, where passion meets precision, and global standards define every session.
+        <div className="mt-16 text-center">
+          <p className="text-lg text-gray-700 leading-relaxed max-w-4xl mx-auto mb-8">
+            Whether you're searching for <strong className="text-primary-600">martial arts classes</strong> or want to join a <strong className="text-primary-600">professional training academy</strong>, we are the name to trust. Experience the difference of learning at our <strong className="text-accent-600">premier martial arts school</strong>, where passion meets precision, and excellence defines every training session.
           </p>
+          <button className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-8 py-3 rounded-lg font-semibold transition-all shadow-lg hover:scale-105 hover:shadow-xl">
+            Discover Our Programs
+          </button>
         </div>
       </div>
     </section>

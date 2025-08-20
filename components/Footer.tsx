@@ -17,7 +17,7 @@ export default function Footer() {
           </div>
           
           <div className="text-gray-400 text-sm">
-            © 2024 Taekwondonomics. All rights reserved.
+            © 2024 Singapore Akira Taekwondo. All rights reserved.
           </div>
         </div>
         
@@ -36,9 +36,9 @@ export default function Footer() {
             <div>
               <h4 className="font-semibold mb-3">Programs</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Super Junior</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Kids Classes</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Adult Executive</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Beginners</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Youth Classes</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Adult Programs</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Competition Team</a></li>
               </ul>
             </div>
@@ -56,10 +56,10 @@ export default function Footer() {
             <div>
               <h4 className="font-semibold mb-3">Connect</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="https://wa.me/6593882846" className="hover:text-white transition-colors">WhatsApp</a></li>
-                <li><a href="mailto:enquiries.taekwondonomics@gmail.com" className="hover:text-white transition-colors">Email</a></li>
-                <li><a href="https://instagram.com/taekwondonomics.sg" className="hover:text-white transition-colors">Instagram</a></li>
-                <li><a href="https://facebook.com/TaekwondonomicsSg" className="hover:text-white transition-colors">Facebook</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">WhatsApp</a></li>
+                <li><a href="mailto:info@martialarts.com" className="hover:text-white transition-colors">Email</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Instagram</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Facebook</a></li>
               </ul>
             </div>
           </div>

@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Taekwondonomics - Premier Taekwondo Training in Singapore',
-  description: 'Asia\'s best picked taekwondo school offering world-class training programs for all ages. Boutique taekwondo studio with award-winning coaches.',
+  title: 'Singapore Akira Taekwondo - Premier Taekwondo Training',
+  description: 'Professional taekwondo academy in Singapore offering world-class training programs for all ages. Expert instructors and comprehensive programs for every skill level.',
 }
 
 export default function RootLayout({

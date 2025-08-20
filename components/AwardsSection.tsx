@@ -4,39 +4,39 @@ export default function AwardsSection() {
   const awards = [
     {
       icon: <Trophy className="w-12 h-12" />,
-      title: "Best Taekwondo School Asia",
+      title: "Excellence in Martial Arts",
       year: "2023",
-      organization: "Asian Martial Arts Federation"
+      organization: "Martial Arts Federation"
     },
     {
       icon: <Medal className="w-12 h-12" />,
-      title: "Excellence in Training",
+      title: "Outstanding Training Program",
       year: "2023",
-      organization: "Singapore Sports Council"
+      organization: "Sports Excellence Council"
     },
     {
       icon: <Star className="w-12 h-12" />,
-      title: "Outstanding Coach Award",
+      title: "Professional Instructor Award",
       year: "2022",
-      organization: "Singapore Taekwondo Federation"
+      organization: "Martial Arts Association"
     },
     {
       icon: <Award className="w-12 h-12" />,
-      title: "Quality Service Award",
+      title: "Quality Education Award",
       year: "2022",
-      organization: "National Sports Association"
+      organization: "Education Standards Board"
     },
     {
       icon: <Trophy className="w-12 h-12" />,
-      title: "Innovation in Sports Education",
+      title: "Innovation in Training",
       year: "2021",
-      organization: "Asia Pacific Sports Awards"
+      organization: "Sports Innovation Awards"
     },
     {
       icon: <Medal className="w-12 h-12" />,
-      title: "Community Impact Award",
+      title: "Community Service Award",
       year: "2021",
-      organization: "Singapore Community Foundation"
+      organization: "Community Foundation"
     }
   ]
 
@@ -48,9 +48,9 @@ export default function AwardsSection() {
             AWARDS
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Join us today and discover why we're Asia's best picked taekwondo school and the top choice for 
-            taekwondo training in Singapore. Explore our award-winning taekwondo school programs and see how 
-            we've become the leaders in taekwondo service Singapore with our unmatched commitment to excellence.
+            Join us today and discover why we're a leading martial arts academy and the top choice for 
+            professional martial arts training. Explore our award-winning programs and see how 
+            we've become leaders in martial arts education with our unmatched commitment to excellence.
           </p>
         </div>
 
@@ -94,22 +94,22 @@ export default function AwardsSection() {
                 <div className="text-primary-600 mb-2">
                   <Award className="w-8 h-8 mx-auto" />
                 </div>
-                <h4 className="font-semibold text-gray-900">Singapore Taekwondo Federation</h4>
-                <p className="text-gray-600 text-sm">Official Affiliate</p>
+                <h4 className="font-semibold text-gray-900">Martial Arts Federation</h4>
+                <p className="text-gray-600 text-sm">Certified Member</p>
               </div>
               <div>
                 <div className="text-primary-600 mb-2">
                   <Trophy className="w-8 h-8 mx-auto" />
                 </div>
-                <h4 className="font-semibold text-gray-900">World Taekwondo</h4>
+                <h4 className="font-semibold text-gray-900">International Standards</h4>
                 <p className="text-gray-600 text-sm">Recognized Training Center</p>
               </div>
               <div>
                 <div className="text-primary-600 mb-2">
                   <Star className="w-8 h-8 mx-auto" />
                 </div>
-                <h4 className="font-semibold text-gray-900">ISO Certified</h4>
-                <p className="text-gray-600 text-sm">Quality Management</p>
+                <h4 className="font-semibold text-gray-900">Quality Certified</h4>
+                <p className="text-gray-600 text-sm">Excellence Standards</p>
               </div>
             </div>
           </div>
