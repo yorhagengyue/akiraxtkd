@@ -21,7 +21,7 @@ export default function ContactSection() {
               <MessageSquare className="w-6 h-6 text-accent-500 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold mb-2">WhatsApp</h3>
-                <a href="#" className="text-accent-500 hover:text-accent-400 transition-colors">
+                <a href="https://wa.me/6591234567" className="text-accent-500 hover:text-accent-400 transition-colors">
                   +1 (555) 123-4567
                 </a>
               </div>
@@ -31,8 +31,8 @@ export default function ContactSection() {
               <Mail className="w-6 h-6 text-accent-500 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold mb-2">Email</h3>
-                <a href="mailto:info@martialarts.com" className="text-accent-500 hover:text-accent-400 transition-colors">
-                  info@martialarts.com
+                <a href="mailto:info@akiraxtkd.com" className="text-accent-500 hover:text-accent-400 transition-colors">
+                  info@akiraxtkd.com
                 </a>
               </div>
             </div>
@@ -64,8 +64,8 @@ export default function ContactSection() {
               <div>
                 <h3 className="text-lg font-semibold mb-2">Location</h3>
                 <p className="text-gray-300">
-                  123 Main Street<br />
-                  Your City, State 12345
+                  Multiple Locations:<br />
+                  Tampines, Compassvale, Bedok
                 </p>
               </div>
             </div>
@@ -75,9 +75,11 @@ export default function ContactSection() {
               <div>
                 <h3 className="text-lg font-semibold mb-2">Operating Hours</h3>
                 <div className="text-gray-300 space-y-1">
-                  <p>Monday - Friday: 3:00 PM - 9:00 PM</p>
-                  <p>Saturday: 9:00 AM - 6:00 PM</p>
-                  <p>Sunday: 9:00 AM - 4:00 PM</p>
+                  <p>Monday: 8:00 PM - 9:00 PM</p>
+                  <p>Tuesday: 7:30 PM - 8:30 PM</p>
+                  <p>Thursday: 7:30 PM - 9:00 PM</p>
+                  <p>Friday: 6:30 PM - 9:30 PM</p>
+                  <p>Saturday: Contact for schedule</p>
                 </div>
               </div>
             </div>
