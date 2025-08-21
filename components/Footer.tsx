@@ -17,7 +17,7 @@ export default function Footer() {
           </div>
           
           <div className="text-gray-400 text-sm">
-            © 2024 Singapore Akira Taekwondo. All rights reserved.
+            © 2024 Singapore Akira X Taekwondo. All rights reserved.
           </div>
         </div>
         
@@ -58,8 +58,8 @@ export default function Footer() {
               <ul className="space-y-2 text-gray-400">
                 <li><a href="#" className="hover:text-white transition-colors">WhatsApp</a></li>
                 <li><a href="mailto:info@martialarts.com" className="hover:text-white transition-colors">Email</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Instagram</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Facebook</a></li>
+                <li><a href="https://www.instagram.com/akiraxtaekwondo/" className="hover:text-white transition-colors">Instagram</a></li>
+                <li><a href="https://www.tiktok.com/@akirax_taekwondo" className="hover:text-white transition-colors">TikTok</a></li>
               </ul>
             </div>
           </div>

@@ -1,39 +1,44 @@
 export default function ClassesSection() {
   const classes = [
     {
-      name: "Beginners",
-      ageRange: "3-5 years",
-      description: "Fun introduction to martial arts fundamentals with games and basic movements",
-      image: "https://via.placeholder.com/400x300/3b82f6/ffffff?text=Beginners+Class",
-      features: ["Basic movements", "Coordination development", "Social skills", "Fun activities"]
+      name: "Monday Classes",
+      ageRange: "8pm to 9pm",
+      location: "604 Tampines Avenue 9",
+      description: "Weekly taekwondo training sessions with focus on technique and discipline",
+      image: "https://via.placeholder.com/400x300/3b82f6/ffffff?text=Monday+Classes",
+      features: ["Technical training", "Belt progression", "Fitness development", "Character building"]
     },
     {
-      name: "Youth",
-      ageRange: "6-12 years",
-      description: "Structured learning with discipline, respect, and fundamental techniques",
-      image: "https://via.placeholder.com/400x300/2563eb/ffffff?text=Youth+Class",
-      features: ["Fundamental techniques", "Character building", "Belt progression", "Fitness development"]
+      name: "Tuesday Classes",
+      ageRange: "7:30pm to 8:30pm",
+      location: "211C Compassvale Lane",
+      description: "Mid-week training focusing on forms and sparring techniques",
+      image: "https://via.placeholder.com/400x300/2563eb/ffffff?text=Tuesday+Classes",
+      features: ["Poomsae practice", "Sparring techniques", "Flexibility training", "Mental focus"]
     },
     {
-      name: "Adult Programs",
-      ageRange: "13+ years",
-      description: "Comprehensive training for teens and working professionals",
-      image: "https://via.placeholder.com/400x300/1d4ed8/ffffff?text=Adult+Programs",
-      features: ["Advanced techniques", "Self-defense", "Fitness training", "Stress relief"]
+      name: "Thursday Classes",
+      ageRange: "7:30pm to 9pm",
+      location: "217C Compassvale Drive",
+      description: "Extended training session with comprehensive skill development",
+      image: "https://via.placeholder.com/400x300/1d4ed8/ffffff?text=Thursday+Classes",
+      features: ["Extended practice", "Advanced techniques", "Competition prep", "Strength building"]
     },
     {
-      name: "Intensive Training",
-      ageRange: "All levels",
-      description: "Intensive training for rapid skill development and advancement",
-      image: "https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Intensive+Training",
-      features: ["Accelerated learning", "Personal coaching", "Goal-oriented", "Flexible schedule"]
+      name: "Friday Classes",
+      ageRange: "6:30pm to 8pm & 8pm to 9:30pm",
+      location: "Fengshan CC, Bedok North Street 2",
+      description: "Two Friday sessions - fundamentals and advanced training",
+      image: "https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Friday+Classes",
+      features: ["Fundamental techniques", "Advanced sparring", "Competition training", "Flexible timing"]
     },
     {
-      name: "Competition Team",
-      ageRange: "Advanced",
-      description: "High-performance training for competitive athletes and tournaments",
-      image: "https://via.placeholder.com/400x300/f59e0b/ffffff?text=Competition+Team",
-      features: ["Competition preparation", "Advanced sparring", "Mental conditioning", "Tournament support"]
+      name: "Saturday Classes",
+      ageRange: "Time TBA",
+      location: "207A Compassvale Lane",
+      description: "Weekend training sessions for all skill levels",
+      image: "https://via.placeholder.com/400x300/f59e0b/ffffff?text=Saturday+Classes",
+      features: ["Weekend training", "All skill levels", "Flexible practice", "Community building"]
     }
   ]
 
@@ -70,6 +75,7 @@ export default function ClassesSection() {
                     {classItem.name}
                   </h3>
                   <p className="text-sm opacity-90">{classItem.ageRange}</p>
+                  <p className="text-xs opacity-80 mt-1">{classItem.location}</p>
                 </div>
                 <div className="absolute top-4 right-4 w-8 h-8 bg-white/20 rounded-full backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:rotate-12">
                   <div className="w-4 h-4 bg-accent-400 rounded-full"></div>
