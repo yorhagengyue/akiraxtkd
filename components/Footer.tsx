@@ -17,7 +17,7 @@ export default function Footer() {
           </div>
           
           <div className="text-gray-400 text-sm">
-            © 2024 Singapore Akira X Taekwondo. All rights reserved.
+            © 2024 Akira X Taekwondo. All rights reserved.
           </div>
         </div>
         
