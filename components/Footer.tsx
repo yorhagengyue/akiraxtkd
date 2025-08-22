@@ -56,8 +56,8 @@ export default function Footer() {
             <div>
               <h4 className="font-semibold mb-3">Connect</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="https://wa.me/6591234567" className="hover:text-white transition-colors">WhatsApp</a></li>
-                <li><a href="mailto:info@akiraxtkd.com" className="hover:text-white transition-colors">Email</a></li>
+                <li><a href="https://wa.me/6587668794" className="hover:text-white transition-colors">WhatsApp</a></li>
+                <li><a href="mailto:teamakiraxtaekwondo@gmail.com" className="hover:text-white transition-colors">Email</a></li>
                 <li><a href="https://www.instagram.com/akiraxtaekwondo/" className="hover:text-white transition-colors">Instagram</a></li>
                 <li><a href="https://www.tiktok.com/@akirax_taekwondo" className="hover:text-white transition-colors">TikTok</a></li>
               </ul>

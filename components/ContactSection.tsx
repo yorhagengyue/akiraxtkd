@@ -21,8 +21,8 @@ export default function ContactSection() {
               <MessageSquare className="w-6 h-6 text-accent-500 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold mb-2">WhatsApp</h3>
-                <a href="https://wa.me/6591234567" className="text-accent-500 hover:text-accent-400 transition-colors">
-                  +1 (555) 123-4567
+                <a href="https://wa.me/6587668794" className="text-accent-500 hover:text-accent-400 transition-colors">
+                  +65 8766 8794
                 </a>
               </div>
             </div>
@@ -31,8 +31,8 @@ export default function ContactSection() {
               <Mail className="w-6 h-6 text-accent-500 mt-1 flex-shrink-0" />
               <div>
                 <h3 className="text-lg font-semibold mb-2">Email</h3>
-                <a href="mailto:info@akiraxtkd.com" className="text-accent-500 hover:text-accent-400 transition-colors">
-                  info@akiraxtkd.com
+                <a href="mailto:teamakiraxtaekwondo@gmail.com" className="text-accent-500 hover:text-accent-400 transition-colors">
+                  teamakiraxtaekwondo@gmail.com
                 </a>
               </div>
             </div>
@@ -113,7 +113,7 @@ export default function ContactSection() {
                   name="email"
                   required
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white"
-                  placeholder="your@email.com"
+                  placeholder="teamakiraxtaekwondo@gmail.com"
                 />
               </div>
 
@@ -126,7 +126,7 @@ export default function ContactSection() {
                   id="phone"
                   name="phone"
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white"
-                  placeholder="+65 9XXX XXXX"
+                  placeholder="+65 8766 8794"
                 />
               </div>
 
@@ -140,11 +140,11 @@ export default function ContactSection() {
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white"
                 >
                   <option value="">Select a class</option>
-                  <option value="beginners">Beginners (3-5 years)</option>
-                  <option value="youth">Youth (6-12 years)</option>
-                  <option value="adult">Adult Programs</option>
-                  <option value="intensive">Intensive Training</option>
-                  <option value="competition">Competition Team</option>
+                  <option value="monday">Monday Classes</option>
+                  <option value="tuesday">Tuesday Classes</option>
+                  <option value="thursday">Thursday Classes</option>
+                  <option value="friday">Friday Classes</option>
+                  <option value="saturday">Saturday Classes</option>
                 </select>
               </div>
 

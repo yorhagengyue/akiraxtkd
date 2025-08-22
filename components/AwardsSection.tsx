@@ -101,15 +101,15 @@ export default function AwardsSection() {
                 <div className="text-primary-600 mb-2">
                   <Trophy className="w-8 h-8 mx-auto" />
                 </div>
-                <h4 className="font-semibold text-gray-900">International Standards</h4>
-                <p className="text-gray-600 text-sm">Recognized Training Center</p>
+                <h4 className="font-semibold text-gray-900">Singapore Taekwondo Federation</h4>
+                <p className="text-gray-600 text-sm">Certificated Club</p>
               </div>
               <div>
                 <div className="text-primary-600 mb-2">
                   <Star className="w-8 h-8 mx-auto" />
                 </div>
-                <h4 className="font-semibold text-gray-900">Quality Certified</h4>
-                <p className="text-gray-600 text-sm">Excellence Standards</p>
+                <h4 className="font-semibold text-gray-900">International Standards</h4>
+                <p className="text-gray-600 text-sm">Excellent Safety Standards</p>
               </div>
             </div>
           </div>
