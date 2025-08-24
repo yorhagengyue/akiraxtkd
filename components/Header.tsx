@@ -102,6 +102,21 @@ export default function Header() {
         { name: 'Locations', href: '#locations' }
       ]
     },
+    {
+      name: 'Pattern',
+      href: '/patterns',
+      submenu: [
+        { name: 'Preliminary Poomsae', href: '/patterns/preliminary' },
+        { name: 'Taeguek IL Jang', href: '/patterns/taeguek-il-jang' },
+        { name: 'Taeguek E (2) Jang', href: '/patterns/taeguek-e-jang' },
+        { name: 'Taeguek Sam (3) Jang', href: '/patterns/taeguek-sam-jang' },
+        { name: 'Taeguek Sa (4) Jang', href: '/patterns/taeguek-sa-jang' },
+        { name: 'Taeguek O (5) Jang', href: '/patterns/taeguek-o-jang' },
+        { name: 'Taeguek Yuk (6) Jang', href: '/patterns/taeguek-yuk-jang' },
+        { name: 'Taeguek Chil (7) Jang', href: '/patterns/taeguek-chil-jang' },
+        { name: 'Taeguek Pal (8) Jang', href: '/patterns/taeguek-pal-jang' }
+      ]
+    },
     { name: 'Classes', href: '#classes' },
     { name: 'News', href: '#news' },
     { name: 'Contact', href: '#contact' }
