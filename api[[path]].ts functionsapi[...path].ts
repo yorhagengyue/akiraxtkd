@@ -1,0 +1,3 @@
+[33m8a16b48[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Fix API configuration for Cloudflare Pages deployment
+[33m670f144[m Complete demo auth system
+[33m927812a[m Complete contact information and accreditation updates - Update email to teamakiraxtaekwondo@gmail.com - Update WhatsApp to +65 8766 8794 - Update Singapore Taekwondo Federation certification info - Update class selection options to match actual schedule - Update form placeholders with real contact info - Fix Recognition & Accreditation section details

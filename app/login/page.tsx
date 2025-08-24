@@ -177,6 +177,7 @@ export default function LoginPage() {
                 <div className="mb-6">
                   <h2 className="text-lg font-bold text-gray-900 mb-1">Akira X Taekwondo</h2>
                   <p className="text-sm text-gray-500">Singapore Premier Academy</p>
+                  <p className="text-xs text-blue-600 font-medium mt-1">demo v0.1</p>
                 </div>
                 <h1 className="mb-2 text-2xl font-bold text-gray-900">Sign In</h1>
                 <p className="text-gray-600">Enter your credentials to continue</p>
