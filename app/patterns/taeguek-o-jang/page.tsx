@@ -19,7 +19,7 @@ const taeguekojangPattern = {
     'Palm heel strike (바탕손치기)',
     'Roundhouse kick (돌려차기)'
   ],
-  videoPath: '/clips/taeguek-o-jang.mp4',
+  videoPath: '/clips/taeguek-o-5-jang.mp4',
   difficulty: 'Intermediate' as const,
   movements: 20,
   meaning: 'Taeguek O Jang represents "Seon" (☴), symbolizing wind. Wind can be gentle and soothing or powerful and destructive. This pattern teaches students to be flexible like wind while maintaining the ability to strike with sudden, penetrating force.',

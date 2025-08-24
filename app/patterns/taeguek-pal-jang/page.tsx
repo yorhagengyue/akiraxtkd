@@ -19,7 +19,7 @@ const taeguekpaljangPattern = {
     'Jump back kick (뛰어뒤차기)',
     'Preparation for black belt forms'
   ],
-  videoPath: '/clips/taeguek-pal-jang.mp4',
+  videoPath: '/clips/taeguek-pal-8-jang.mp4',
   difficulty: 'Advanced' as const,
   movements: 24,
   meaning: 'Taeguek Pal Jang represents "Gon" (☷), symbolizing earth and the receptive principle. Earth is the foundation that supports all life, representing completion, receptivity, and the culmination of the Taeguek series. This pattern prepares students for black belt level training.',

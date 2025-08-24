@@ -18,7 +18,7 @@ const preliminaryPattern = {
     'High block (위막기)',
     'Basic balance and coordination'
   ],
-  videoPath: '/clips/preliminary.mp4',
+  videoPath: '/clips/preliminary-poomsae.mp4',
   difficulty: 'Beginner' as const,
   movements: 8,
   meaning: 'The Preliminary Poomsae serves as the foundation for all future patterns. It introduces students to the basic principles of Taekwondo movement, proper stancing, and fundamental techniques that will be built upon throughout their martial arts journey.',

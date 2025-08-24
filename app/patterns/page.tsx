@@ -11,6 +11,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AnimatedPage from '@/components/animations/AnimatedPage';
 import ScrollReveal from '@/components/animations/ScrollReveal';
+import VideoPreview from '@/components/VideoPreview';
 import { Play, Award, BookOpen, Target, Search, Filter, ChevronDown, Home, ArrowRight, Check, User } from 'lucide-react';
 
 interface Pattern {
@@ -34,7 +35,7 @@ const patterns: Pattern[] = [
     beltColor: '#ffffff',
     description: 'The foundational pattern for beginners, focusing on basic stances, blocks, and strikes.',
     keyPoints: ['Basic stances', 'Fundamental blocks', 'Simple strikes', 'Balance and coordination'],
-    videoPath: '/clips/preliminary.mp4',
+    videoPath: '/clips/preliminary-poomsae.mp4',
     difficulty: 'Beginner'
   },
   {
@@ -45,7 +46,7 @@ const patterns: Pattern[] = [
     beltColor: '#ffd700',
     description: 'First of the Taeguek series, representing the symbol of "Keon" - heaven and light.',
     keyPoints: ['Walking stance', 'Low block', 'Middle punch', 'Front kick'],
-    videoPath: '/clips/taeguek-il-jang.mp4',
+    videoPath: '/clips/taeguek-il-1-jang.mp4',
     difficulty: 'Beginner'
   },
   {
@@ -56,7 +57,7 @@ const patterns: Pattern[] = [
     beltColor: '#ffd700',
     description: 'Second Taeguek pattern, representing "Tae" - joyfulness and firmness.',
     keyPoints: ['Inner block', 'Knife hand strike', 'Side kick', 'Back stance'],
-    videoPath: '/clips/taeguek-e-jang.mp4',
+    videoPath: '/clips/taeguek-e-2-jang.mp4',
     difficulty: 'Beginner'
   },
   {
@@ -67,7 +68,7 @@ const patterns: Pattern[] = [
     beltColor: '#008000',
     description: 'Third Taeguek pattern, representing "Ra" - fire, sun, and heat.',
     keyPoints: ['Double knife hand block', 'Spear hand thrust', 'Roundhouse kick', 'Cat stance'],
-    videoPath: '/clips/taeguek-sam-jang.mp4',
+    videoPath: '/clips/taeguek-sam-3-jang.mp4',
     difficulty: 'Intermediate'
   },
   {
@@ -78,7 +79,7 @@ const patterns: Pattern[] = [
     beltColor: '#008000',
     description: 'Fourth Taeguek pattern, representing "Jin" - thunder, great power and dignity.',
     keyPoints: ['Double forearm block', 'Back fist strike', 'Side kick', 'Cross stance'],
-    videoPath: '/clips/taeguek-sa-jang.mp4',
+    videoPath: '/clips/taeguek-sa-4-jang.mp4',
     difficulty: 'Intermediate'
   },
   {
@@ -89,7 +90,7 @@ const patterns: Pattern[] = [
     beltColor: '#0000ff',
     description: 'Fifth Taeguek pattern, representing "Seon" - wind, gentle but sometimes violent.',
     keyPoints: ['Hammer fist strike', 'Elbow strike', 'Hook kick', 'Crane stance'],
-    videoPath: '/clips/taeguek-o-jang.mp4',
+    videoPath: '/clips/taeguek-o-5-jang.mp4',
     difficulty: 'Intermediate'
   },
   {
@@ -100,7 +101,7 @@ const patterns: Pattern[] = [
     beltColor: '#0000ff',
     description: 'Sixth Taeguek pattern, representing "Gam" - water, flowing and adaptable.',
     keyPoints: ['High block', 'Palm heel strike', 'Axe kick', 'Twist stance'],
-    videoPath: '/clips/taeguek-yuk-jang.mp4',
+    videoPath: '/clips/taeguek-yuk-6-jang.mp4',
     difficulty: 'Advanced'
   },
   {
@@ -111,7 +112,7 @@ const patterns: Pattern[] = [
     beltColor: '#ff0000',
     description: 'Seventh Taeguek pattern, representing "Gan" - mountain, ponderance and firmness.',
     keyPoints: ['Tiger stance', 'Ridge hand strike', 'Turning kick', 'Jump techniques'],
-    videoPath: '/clips/taeguek-chil-jang.mp4',
+    videoPath: '/clips/taeguek-chil-7-jang.mp4',
     difficulty: 'Advanced'
   },
   {
@@ -122,7 +123,7 @@ const patterns: Pattern[] = [
     beltColor: '#ff0000',
     description: 'Eighth and final Taeguek pattern, representing "Gon" - earth, the foundation.',
     keyPoints: ['Complex combinations', 'Multiple kicks', 'Advanced techniques', 'Preparation for black belt'],
-    videoPath: '/clips/taeguek-pal-jang.mp4',
+    videoPath: '/clips/taeguek-pal-8-jang.mp4',
     difficulty: 'Advanced'
   }
 ];
@@ -367,116 +368,149 @@ export default function PatternsPage() {
               </p>
             </div>
 
-            {/* Pattern Cards Grid */}
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {filteredPatterns.map((pattern, index) => (
-                <ScrollReveal key={pattern.id} delay={index * 50}>
-                  <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden hover:-translate-y-0.5 border border-gray-100">
-                    {/* Belt Color Bar with Label */}
-                    <div 
-                      className="h-1 w-full relative"
-                      style={{ backgroundColor: getBeltColor(pattern.beltColor) }}
-                    >
-                      <div className="absolute top-1 left-4 bg-white px-2 py-0.5 rounded-b text-xs font-medium text-gray-700 shadow-sm">
-                        {pattern.beltLevel}
+            {/* Dynamic Pattern Layout */}
+            <div className="space-y-8">
+              {/* Belt Level Sections */}
+              {['White Belt', 'Yellow Belt', 'Green Belt', 'Blue Belt', 'Red Belt'].map(beltLevel => {
+                const beltPatterns = filteredPatterns.filter(p => p.beltLevel.includes(beltLevel.split(' ')[0]));
+                if (beltPatterns.length === 0) return null;
+                
+                return (
+                  <div key={beltLevel} className="belt-section">
+                    {/* Belt Level Header */}
+                    <div className="flex items-center mb-6">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-12 h-3 rounded-full shadow-sm border"
+                          style={{ 
+                            backgroundColor: beltPatterns[0]?.beltColor === '#ffffff' ? '#e5e7eb' : beltPatterns[0]?.beltColor 
+                          }}
+                        ></div>
+                        <h3 className="text-xl font-bold text-gray-900">{beltLevel}</h3>
+                        <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                          {beltPatterns.length} pattern{beltPatterns.length > 1 ? 's' : ''}
+                        </span>
                       </div>
+                      <div className="flex-1 ml-6 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
                     </div>
                     
-                    {/* Card Content */}
-                    <div className="p-5">
-                      {/* Header Row */}
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <div className="flex items-baseline gap-2 mb-1">
-                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
-                              {pattern.name}
-                            </h3>
-                            <span className="text-sm text-gray-500 font-medium">
-                              {pattern.koreanName}
-                            </span>
+                    {/* Patterns for this belt level */}
+                    <div className="grid gap-6">
+                      {beltPatterns.map((pattern, index) => (
+                        <ScrollReveal key={pattern.id} delay={index * 100}>
+                          <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100">
+                            <div className="flex flex-col lg:flex-row">
+                              {/* Left: Video Preview Area */}
+                              <VideoPreview
+                                videoSrc={pattern.videoPath}
+                                patternName={pattern.name}
+                                beltColor={pattern.beltColor}
+                                difficulty={pattern.difficulty}
+                                className="lg:w-80 h-48 lg:h-auto"
+                                autoPreview={true}
+                              />
+                              
+                              {/* Right: Content */}
+                              <div className="flex-1 p-6 lg:p-8">
+                                {/* Header */}
+                                <div className="flex items-start justify-between mb-4">
+                                  <div>
+                                    <div className="flex items-baseline gap-3 mb-2">
+                                      <h3 className="text-2xl font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
+                                        {pattern.name}
+                                      </h3>
+                                      <span className="text-lg text-gray-500 font-medium">
+                                        {pattern.koreanName}
+                                      </span>
+                                    </div>
+                                    <p className="text-sm text-gray-600 font-medium mb-3">
+                                      {pattern.beltLevel}
+                                    </p>
+                                  </div>
+                                  
+                                  <Link href={`/patterns/${pattern.id}`}>
+                                    <button className="p-3 rounded-xl bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors">
+                                      <Play className="w-5 h-5" />
+                                    </button>
+                                  </Link>
+                                </div>
+                                
+                                {/* Description */}
+                                <p className="text-gray-700 leading-relaxed mb-6">
+                                  {pattern.description}
+                                </p>
+                                
+                                {/* Key Techniques Grid */}
+                                <div className="mb-6">
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                                    <Target className="w-4 h-4 mr-2 text-primary-600" />
+                                    Key Techniques
+                                  </h4>
+                                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                    {pattern.keyPoints.slice(0, 6).map((point, idx) => {
+                                      const technique = point.split('(')[0].trim();
+                                      return (
+                                        <button
+                                          key={idx}
+                                          onClick={() => toggleTechnique(technique)}
+                                          className="text-left px-3 py-2 bg-gray-50 hover:bg-primary-50 text-gray-700 hover:text-primary-700 text-sm rounded-lg transition-colors border border-transparent hover:border-primary-200"
+                                        >
+                                          {technique}
+                                        </button>
+                                      );
+                                    })}
+                                    {pattern.keyPoints.length > 6 && (
+                                      <div className="px-3 py-2 bg-gray-50 text-gray-600 text-sm rounded-lg border">
+                                        +{pattern.keyPoints.length - 6} more
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                {/* Actions */}
+                                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                                  <div className="flex gap-3">
+                                    <button
+                                      onClick={() => handleProgressToggle(pattern.id, 'learning')}
+                                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                        userProgress[pattern.id] === 'learning'
+                                          ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                                          : 'bg-gray-100 text-gray-700 hover:bg-blue-50 border border-gray-200'
+                                      }`}
+                                    >
+                                      <BookOpen className="w-4 h-4" />
+                                      Learning
+                                    </button>
+                                    <button
+                                      onClick={() => handleProgressToggle(pattern.id, 'mastered')}
+                                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                        userProgress[pattern.id] === 'mastered'
+                                          ? 'bg-green-100 text-green-700 border border-green-200'
+                                          : 'bg-gray-100 text-gray-700 hover:bg-green-50 border border-gray-200'
+                                      }`}
+                                    >
+                                      <Check className="w-4 h-4" />
+                                      Mastered
+                                    </button>
+                                  </div>
+                                  
+                                  <Link 
+                                    href={`/patterns/${pattern.id}`}
+                                    className="flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium transition-colors"
+                                  >
+                                    View Full Details
+                                    <ArrowRight className="w-4 h-4" />
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <div className={`inline-block px-2 py-1 rounded-lg text-xs font-medium border ${getDifficultyColor(pattern.difficulty)}`}>
-                            {pattern.difficulty}
-                          </div>
-                        </div>
-                        
-                        <Link href={`/patterns/${pattern.id}`}>
-                          <button className="p-2 rounded-full bg-gray-50 group-hover:bg-primary-50 transition-colors">
-                            <Play className="w-5 h-5 text-gray-600 group-hover:text-primary-600 transition-colors" />
-                          </button>
-                        </Link>
-                      </div>
-                      
-                      {/* Description */}
-                      <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">
-                        {pattern.description}
-                      </p>
-                      
-                      {/* Key Techniques */}
-                      <div className="mb-4">
-                        <h4 className="text-xs font-semibold text-gray-700 mb-2 flex items-center">
-                          <Target className="w-3 h-3 mr-1" />
-                          Key Techniques
-                        </h4>
-                        <div className="flex flex-wrap gap-1">
-                          {pattern.keyPoints.slice(0, 2).map((point, idx) => {
-                            const technique = point.split('(')[0].trim();
-                            return (
-                              <button
-                                key={idx}
-                                onClick={() => toggleTechnique(technique)}
-                                className="px-2 py-1 bg-gray-100 hover:bg-primary-100 text-gray-700 hover:text-primary-700 text-xs rounded transition-colors"
-                              >
-                                {technique}
-                              </button>
-                            );
-                          })}
-                          {pattern.keyPoints.length > 2 && (
-                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                              +{pattern.keyPoints.length - 2} more
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* Progress Actions */}
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleProgressToggle(pattern.id, 'learning')}
-                            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs transition-colors ${
-                              userProgress[pattern.id] === 'learning'
-                                ? 'bg-blue-100 text-blue-700'
-                                : 'bg-gray-100 text-gray-600 hover:bg-blue-50'
-                            }`}
-                          >
-                            <BookOpen className="w-3 h-3" />
-                            Learning
-                          </button>
-                          <button
-                            onClick={() => handleProgressToggle(pattern.id, 'mastered')}
-                            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs transition-colors ${
-                              userProgress[pattern.id] === 'mastered'
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-gray-100 text-gray-600 hover:bg-green-50'
-                            }`}
-                          >
-                            <Check className="w-3 h-3" />
-                            Mastered
-                          </button>
-                        </div>
-                        
-                        <Link 
-                          href={`/patterns/${pattern.id}`}
-                          className="text-xs text-primary-600 hover:text-primary-700 font-medium"
-                        >
-                          View Details →
-                        </Link>
-                      </div>
+                        </ScrollReveal>
+                      ))}
                     </div>
                   </div>
-                </ScrollReveal>
-              ))}
+                );
+              })}
             </div>
 
             {/* No Results */}

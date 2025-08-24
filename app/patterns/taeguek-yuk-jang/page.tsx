@@ -19,7 +19,7 @@ const taeguekyukjangPattern = {
     'Ridge hand strike (손날등치기)',
     'Turning kick (돌려차기)'
   ],
-  videoPath: '/clips/taeguek-yuk-jang.mp4',
+  videoPath: '/clips/taeguek-yuk-6-jang.mp4',
   difficulty: 'Advanced' as const,
   movements: 19,
   meaning: 'Taeguek Yuk Jang represents "Gam" (☵), symbolizing water. Water is soft and yielding yet persistent and powerful, capable of overcoming the hardest obstacles through constant pressure. This pattern teaches adaptability and persistent effort.',

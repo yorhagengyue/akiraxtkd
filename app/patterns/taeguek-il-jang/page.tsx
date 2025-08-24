@@ -19,7 +19,7 @@ const taeguekiljangPattern = {
     'High block (위막기)',
     'Inner forearm block (안팔목막기)'
   ],
-  videoPath: '/clips/taeguek-il-jang.mp4',
+  videoPath: '/clips/taeguek-il-1-jang.mp4',
   difficulty: 'Beginner' as const,
   movements: 18,
   meaning: 'Taeguek Il Jang represents "Keon" (☰), symbolizing heaven, light, and the creative force. As the first Taeguek pattern, it establishes the foundation for all subsequent forms and represents the beginning of the student\'s journey toward mastery.',

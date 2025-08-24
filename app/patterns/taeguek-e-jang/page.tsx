@@ -19,7 +19,7 @@ const taeguekejangPattern = {
     'Double punch (두번지르기)',
     'High block (위막기)'
   ],
-  videoPath: '/clips/taeguek-e-jang.mp4',
+  videoPath: '/clips/taeguek-e-2-jang.mp4',
   difficulty: 'Beginner' as const,
   movements: 18,
   meaning: 'Taeguek E Jang represents "Tae" (☱), symbolizing joyfulness and the lake. This trigram embodies serenity on the surface with firmness beneath, teaching students to maintain composure while demonstrating strong technique.',

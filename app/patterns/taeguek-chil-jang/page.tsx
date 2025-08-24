@@ -19,7 +19,7 @@ const taeguekchiljangPattern = {
     'Knee strike (무릎치기)',
     'Double punch (두번지르기)'
   ],
-  videoPath: '/clips/taeguek-chil-jang.mp4',
+  videoPath: '/clips/taeguek-chil-7-jang.mp4',
   difficulty: 'Advanced' as const,
   movements: 25,
   meaning: 'Taeguek Chil Jang represents "Gan" (☶), symbolizing the mountain. Mountains are firm, immovable, and ponderant, representing strength, stability, and the ability to endure. This pattern requires students to demonstrate unwavering determination and solid technique.',

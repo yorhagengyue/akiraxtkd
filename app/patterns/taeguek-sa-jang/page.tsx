@@ -19,7 +19,7 @@ const taegueksajangPattern = {
     'Knife hand strike (손날치기)',
     'Elbow strike (팔꿈치치기)'
   ],
-  videoPath: '/clips/taeguek-sa-jang.mp4',
+  videoPath: '/clips/taeguek-sa-4-jang.mp4',
   difficulty: 'Intermediate' as const,
   movements: 20,
   meaning: 'Taeguek Sa Jang represents "Jin" (☳), symbolizing thunder and lightning. This pattern embodies great power, dignity, and the sudden, decisive nature of thunder, requiring students to demonstrate explosive power and precise timing.',

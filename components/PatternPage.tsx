@@ -51,6 +51,7 @@ export default function PatternPage({ pattern }: PatternPageProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [savedVolume, setSavedVolume] = useState(0.6);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const togglePlay = () => {
@@ -65,9 +66,17 @@ export default function PatternPage({ pattern }: PatternPageProps) {
   };
 
   const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+    const video = videoRef.current;
+    if (!video) return;
+    if (isMuted) {
+      video.muted = false;
+      video.volume = savedVolume;
+      setIsMuted(false);
+    } else {
+      // remember last non-zero volume
+      if (video.volume > 0) setSavedVolume(video.volume);
+      video.muted = true;
+      setIsMuted(true);
     }
   };
 
@@ -152,20 +161,25 @@ export default function PatternPage({ pattern }: PatternPageProps) {
         </section>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid lg:grid-cols-3 gap-12">
+          <div className="grid lg:grid-cols-12 gap-8 items-stretch">
             {/* Video Section */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-8">
               <ScrollReveal>
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                  <div className="relative">
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
+                  <div 
+                    className="relative"
+                    onMouseEnter={() => setShowControls(true)}
+                    onMouseLeave={() => setShowControls(false)}
+                  >
                     <div className="relative">
                       <video
                         ref={videoRef}
                         className="w-full aspect-video bg-black"
+                        onClick={togglePlay}
                         onPlay={() => setIsPlaying(true)}
                         onPause={() => setIsPlaying(false)}
-                        onMouseEnter={() => setShowControls(true)}
-                        onMouseLeave={() => setShowControls(false)}
+                        playsInline
+                        preload="metadata"
                         poster=""
                       >
                         <source src={pattern.videoPath} type="video/mp4" />
@@ -173,17 +187,23 @@ export default function PatternPage({ pattern }: PatternPageProps) {
                       </video>
                       
                       {/* Custom Poster */}
-                      <div className="absolute inset-0 pointer-events-none">
-                        <PatternPoster 
-                          patternName={pattern.name}
-                          beltColor={pattern.beltColor}
-                          className="w-full h-full"
-                        />
-                      </div>
+                      { !isPlaying && (
+                        <div className="absolute inset-0 pointer-events-none">
+                          <PatternPoster 
+                            patternName={pattern.name}
+                            beltColor={pattern.beltColor}
+                            className="w-full h-full"
+                          />
+                        </div>
+                      )}
                     </div>
                     
                     {/* Custom Video Controls */}
-                    <div className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+                    <div 
+                      className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}
+                      onMouseEnter={() => setShowControls(true)}
+                      onMouseLeave={() => setShowControls(false)}
+                    >
                       <div className="flex items-center justify-between text-white">
                         <div className="flex items-center space-x-4">
                           <button
@@ -218,7 +238,7 @@ export default function PatternPage({ pattern }: PatternPageProps) {
                     </div>
                   </div>
                   
-                  <div className="p-6">
+                  <div className="p-6 mt-auto">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">Pattern Demonstration</h2>
                     <p className="text-gray-600 leading-relaxed">
                       Watch this detailed demonstration of {pattern.name}. Pay attention to the timing, 
@@ -230,76 +250,49 @@ export default function PatternPage({ pattern }: PatternPageProps) {
             </div>
 
             {/* Pattern Details */}
-            <div className="space-y-8">
-              {/* Key Techniques */}
-              <ScrollReveal delay={200}>
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                    <Target className="w-6 h-6 mr-2 text-primary-600" />
-                    Key Techniques
-                  </h3>
-                  <div className="space-y-2">
-                    {pattern.keyPoints.map((point, index) => (
-                      <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <div className="w-6 h-6 bg-primary-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3">
-                          {index + 1}
-                        </div>
-                        <span className="text-gray-700">{point}</span>
+            <div className="lg:col-span-4">
+              <div className="space-y-6">
+                {/* Key Techniques */}
+                <ScrollReveal delay={200}>
+                  <div className="bg-white rounded-xl shadow-lg overflow-hidden translate-y-0">
+                    <div className="p-6 border-b border-gray-100">
+                      <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                        <Target className="w-6 h-6 mr-2 text-primary-600" />
+                        Key Techniques
+                      </h3>
+                    </div>
+                    <div className="p-6">
+                      <div className="space-y-3">
+                        {pattern.keyPoints.map((point, index) => (
+                          <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-primary-50 transition-colors">
+                            <div className="w-7 h-7 bg-primary-600 text-white rounded-full flex items-center justify-center text-sm font-medium mr-3 flex-shrink-0">
+                              {index + 1}
+                            </div>
+                            <span className="text-gray-700 text-sm leading-relaxed">{point}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </ScrollReveal>
-
-              {/* Pattern Meaning */}
-              {pattern.meaning && (
-                <ScrollReveal delay={300}>
-                  <div className="bg-white rounded-xl shadow-lg p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                      <BookOpen className="w-6 h-6 mr-2 text-accent-600" />
-                      Pattern Meaning
-                    </h3>
-                    <p className="text-gray-700 leading-relaxed">{pattern.meaning}</p>
-                  </div>
-                </ScrollReveal>
-              )}
-
-              {/* Training Tips */}
-              <ScrollReveal delay={400}>
-                <div className="bg-white rounded-xl shadow-lg p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                    <Users className="w-6 h-6 mr-2 text-green-600" />
-                    Training Tips
-                  </h3>
-                  <div className="space-y-3">
-                    {pattern.tips.map((tip, index) => (
-                      <div key={index} className="flex items-start">
-                        <div className="w-2 h-2 bg-green-600 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <p className="text-gray-700 text-sm leading-relaxed">{tip}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </ScrollReveal>
-
-              {/* Prerequisites */}
-              {pattern.prerequisites && pattern.prerequisites.length > 0 && (
-                <ScrollReveal delay={500}>
-                  <div className="bg-white rounded-xl shadow-lg p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                      <Clock className="w-6 h-6 mr-2 text-blue-600" />
-                      Prerequisites
-                    </h3>
-                    <div className="space-y-2">
-                      {pattern.prerequisites.map((prereq, index) => (
-                        <div key={index} className="text-gray-700 text-sm">
-                          • {prereq}
-                        </div>
-                      ))}
                     </div>
                   </div>
                 </ScrollReveal>
-              )}
+
+                {/* Pattern Meaning */}
+                {pattern.meaning && (
+                  <ScrollReveal delay={300}>
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden translate-y-0">
+                      <div className="p-6 border-b border-gray-100">
+                        <h3 className="text-xl font-bold text-gray-900 flex items-center">
+                          <BookOpen className="w-6 h-6 mr-2 text-accent-600" />
+                          Pattern Meaning
+                        </h3>
+                      </div>
+                      <div className="p-6">
+                        <p className="text-gray-700 leading-relaxed text-sm">{pattern.meaning}</p>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                )}
+              </div>
             </div>
           </div>
         </div>

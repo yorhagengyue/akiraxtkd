@@ -19,7 +19,7 @@ const taeguekSamJangPattern = {
     'Inner forearm block (안팔목막기)',
     'Back stance transitions (뒤서기)'
   ],
-  videoPath: '/clips/taeguek-sam-jang.mp4',
+  videoPath: '/clips/taeguek-sam-3-jang.mp4',
   difficulty: 'Intermediate' as const,
   movements: 20,
   meaning: 'Taeguek Sam Jang represents "Ra" (☲), one of the eight trigrams of the I-Ching. Ra symbolizes fire, the sun, and heat. This pattern embodies the bright, hot, and energetic nature of fire, requiring students to demonstrate power, precision, and dynamic movement throughout the form.',
