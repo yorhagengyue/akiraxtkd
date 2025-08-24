@@ -5,13 +5,13 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AnimatedPage from '@/components/animations/AnimatedPage';
 import ScrollReveal from '@/components/animations/ScrollReveal';
-import { Play, Award, BookOpen, Target } from 'lucide-react';
+import { Play, Award, BookOpen, Target, Search, Filter, ChevronDown, Home, ArrowRight, Check, User } from 'lucide-react';
 
 interface Pattern {
   id: string;
@@ -128,157 +128,441 @@ const patterns: Pattern[] = [
 ];
 
 export default function PatternsPage() {
+  // Filter and sort states
+  const [selectedBelt, setSelectedBelt] = useState<string>('all');
+  const [selectedLevel, setSelectedLevel] = useState<string>('all');
+  const [selectedTechniques, setSelectedTechniques] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'sequence' | 'difficulty'>('sequence');
+  const [userProgress, setUserProgress] = useState<Record<string, 'learning' | 'mastered'>>({});
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  // Extract unique techniques for filtering
+  const allTechniques = useMemo(() => {
+    const techniques = new Set<string>();
+    patterns.forEach(pattern => {
+      pattern.keyPoints.forEach(point => {
+        // Extract technique name (before parentheses)
+        const technique = point.split('(')[0].trim();
+        techniques.add(technique);
+      });
+    });
+    return Array.from(techniques).sort();
+  }, []);
+
+  // Filter and sort patterns
+  const filteredPatterns = useMemo(() => {
+    let filtered = patterns.filter(pattern => {
+      // Belt filter
+      if (selectedBelt !== 'all' && !pattern.beltLevel.toLowerCase().includes(selectedBelt)) {
+        return false;
+      }
+      
+      // Level filter
+      if (selectedLevel !== 'all' && pattern.difficulty.toLowerCase() !== selectedLevel) {
+        return false;
+      }
+      
+      // Technique filter
+      if (selectedTechniques.length > 0) {
+        const hasSelectedTechnique = selectedTechniques.some(tech => 
+          pattern.keyPoints.some(point => point.toLowerCase().includes(tech.toLowerCase()))
+        );
+        if (!hasSelectedTechnique) return false;
+      }
+      
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return pattern.name.toLowerCase().includes(query) ||
+               pattern.koreanName.includes(query) ||
+               pattern.beltLevel.toLowerCase().includes(query);
+      }
+      
+      return true;
+    });
+
+    // Sort patterns
+    if (sortBy === 'difficulty') {
+      const difficultyOrder = { 'Beginner': 1, 'Intermediate': 2, 'Advanced': 3 };
+      filtered.sort((a, b) => difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]);
+    }
+    // Default is sequence order (already in correct order)
+
+    return filtered;
+  }, [selectedBelt, selectedLevel, selectedTechniques, searchQuery, sortBy]);
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'Beginner': return 'text-green-600 bg-green-50';
-      case 'Intermediate': return 'text-blue-600 bg-blue-50';
-      case 'Advanced': return 'text-red-600 bg-red-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'Beginner': return 'text-green-600 bg-green-50 border-green-200';
+      case 'Intermediate': return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'Advanced': return 'text-red-600 bg-red-50 border-red-200';
+      default: return 'text-gray-600 bg-gray-50 border-gray-200';
     }
+  };
+
+  const getBeltColor = (beltColor: string) => {
+    return beltColor === '#ffffff' ? '#e5e7eb' : beltColor;
+  };
+
+  const handleProgressToggle = (patternId: string, status: 'learning' | 'mastered') => {
+    // Check if user is logged in (mock check for now)
+    const isLoggedIn = false; // Replace with actual auth check
+    
+    if (!isLoggedIn) {
+      setShowLoginPrompt(true);
+      setTimeout(() => setShowLoginPrompt(false), 3000);
+      return;
+    }
+    
+    setUserProgress(prev => ({
+      ...prev,
+      [patternId]: prev[patternId] === status ? undefined : status
+    }));
+  };
+
+  const toggleTechnique = (technique: string) => {
+    setSelectedTechniques(prev => 
+      prev.includes(technique) 
+        ? prev.filter(t => t !== technique)
+        : [...prev, technique]
+    );
   };
 
   return (
     <AnimatedPage showBeltProgress={true} beltColor="blue">
       <Header />
       
-      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50">
-        {/* Hero Section */}
-        <section className="py-16 bg-gradient-to-r from-primary-600 to-accent-600 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+      <main className="min-h-screen relative">
+        {/* Background Layers */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-primary-50"></div>
+        <div className="absolute inset-0 opacity-5 bg-[url('/img/tatami-pattern.png')] bg-repeat"></div>
+        <div className="absolute bottom-0 right-0 w-1/3 h-1/2 opacity-15 bg-[url('/img/belt-ribbon.svg')] bg-no-repeat bg-bottom bg-contain"></div>
+        
+        {/* Breadcrumb Navigation */}
+        <section className="relative z-10 py-4 bg-white/90 backdrop-blur-sm border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="flex items-center space-x-2 text-sm">
+              <Link href="/" className="flex items-center text-primary-600 hover:text-primary-700 transition-colors">
+                <Home className="w-4 h-4 mr-1" />
+                Home
+              </Link>
+              <ArrowRight className="w-3 h-3 text-gray-400" />
+              <span className="text-gray-900 font-medium">Patterns</span>
+            </nav>
+          </div>
+        </section>
+
+        {/* Hero Section - Reduced Height */}
+        <section className="relative z-10 py-12 bg-gradient-to-r from-primary-600/95 to-accent-600/95 text-white overflow-hidden">
+          {/* Aurora Background */}
+          <div className="absolute inset-0 bg-[url('/img/aurora_bg.svg')] bg-cover bg-center opacity-30"></div>
+          <div className="absolute inset-0 bg-[url('/img/noise_overlay.png')] bg-repeat opacity-20"></div>
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
               Taekwondo Patterns (Poomsae)
             </h1>
-            <p className="text-xl md:text-2xl mb-4 opacity-90">
+            <p className="text-lg md:text-xl mb-3 opacity-90">
               품새 - The Art of Form and Technique
             </p>
-            <p className="text-lg max-w-3xl mx-auto opacity-80">
-              Master the fundamental patterns of Taekwondo, from basic movements to advanced techniques. 
-              Each pattern represents a step in your martial arts journey.
+            <p className="text-base max-w-2xl mx-auto opacity-80">
+              Master the fundamental patterns of Taekwondo, from basic movements to advanced techniques.
             </p>
+          </div>
+          
+          {/* Bottom accent line */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-400 to-accent-400"></div>
+        </section>
+
+        {/* Sticky Filter Bar */}
+        <section className="sticky top-16 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
+              {/* Search */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search patterns..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              
+              {/* Filters */}
+              <div className="flex flex-wrap gap-3 items-center">
+                {/* Belt Filter */}
+                <select
+                  value={selectedBelt}
+                  onChange={(e) => setSelectedBelt(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="all">All Belts</option>
+                  <option value="white">White Belt</option>
+                  <option value="yellow">Yellow Belt</option>
+                  <option value="green">Green Belt</option>
+                  <option value="blue">Blue Belt</option>
+                  <option value="red">Red Belt</option>
+                </select>
+
+                {/* Level Filter */}
+                <select
+                  value={selectedLevel}
+                  onChange={(e) => setSelectedLevel(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="all">All Levels</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+
+                {/* Sort */}
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'sequence' | 'difficulty')}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="sequence">By Sequence</option>
+                  <option value="difficulty">By Difficulty</option>
+                </select>
+              </div>
+
+              {/* Results Count */}
+              <div className="text-sm text-gray-600 whitespace-nowrap">
+                {filteredPatterns.length} of {patterns.length} patterns
+              </div>
+            </div>
+
+            {/* Selected Techniques */}
+            {selectedTechniques.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {selectedTechniques.map(technique => (
+                  <button
+                    key={technique}
+                    onClick={() => toggleTechnique(technique)}
+                    className="inline-flex items-center px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm hover:bg-primary-200 transition-colors"
+                  >
+                    {technique}
+                    <span className="ml-2 text-primary-500">×</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
         {/* Patterns Grid */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <ScrollReveal>
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  Introductory Poomsae
-                </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Progress through the belt system by mastering each pattern. 
-                  Click on any pattern to view detailed instructions and video demonstrations.
-                </p>
-              </div>
-            </ScrollReveal>
+        <section className="relative z-10 py-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Section Header */}
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                Introductory Poomsae
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Progress through the belt system by mastering each pattern.
+              </p>
+            </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {patterns.map((pattern, index) => (
-                <ScrollReveal key={pattern.id} delay={index * 100}>
-                  <Link href={`/patterns/${pattern.id}`}>
-                    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer hover:scale-105">
-                      {/* Belt Color Bar */}
-                      <div 
-                        className="h-2 w-full"
-                        style={{ backgroundColor: pattern.beltColor === '#ffffff' ? '#e5e7eb' : pattern.beltColor }}
-                      ></div>
-                      
-                      {/* Content */}
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(pattern.difficulty)}`}>
-                            {pattern.difficulty}
-                          </div>
-                          <Play className="w-6 h-6 text-primary-600 group-hover:text-accent-600 transition-colors" />
-                        </div>
-                        
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-                          {pattern.name}
-                        </h3>
-                        <p className="text-gray-600 font-medium mb-2">
-                          {pattern.koreanName}
-                        </p>
-                        <p className="text-sm text-primary-600 font-medium mb-3">
-                          {pattern.beltLevel}
-                        </p>
-                        
-                        <p className="text-gray-700 text-sm leading-relaxed mb-4">
-                          {pattern.description}
-                        </p>
-                        
-                        <div className="space-y-2">
-                          <h4 className="text-sm font-semibold text-gray-900 flex items-center">
-                            <Target className="w-4 h-4 mr-2" />
-                            Key Techniques
-                          </h4>
-                          <div className="flex flex-wrap gap-1">
-                            {pattern.keyPoints.slice(0, 3).map((point, idx) => (
-                              <span 
-                                key={idx}
-                                className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
-                              >
-                                {point}
-                              </span>
-                            ))}
-                            {pattern.keyPoints.length > 3 && (
-                              <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                                +{pattern.keyPoints.length - 3} more
-                              </span>
-                            )}
-                          </div>
-                        </div>
+            {/* Pattern Cards Grid */}
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
+              {filteredPatterns.map((pattern, index) => (
+                <ScrollReveal key={pattern.id} delay={index * 50}>
+                  <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden hover:-translate-y-0.5 border border-gray-100">
+                    {/* Belt Color Bar with Label */}
+                    <div 
+                      className="h-1 w-full relative"
+                      style={{ backgroundColor: getBeltColor(pattern.beltColor) }}
+                    >
+                      <div className="absolute top-1 left-4 bg-white px-2 py-0.5 rounded-b text-xs font-medium text-gray-700 shadow-sm">
+                        {pattern.beltLevel}
                       </div>
                     </div>
-                  </Link>
+                    
+                    {/* Card Content */}
+                    <div className="p-5">
+                      {/* Header Row */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <div className="flex items-baseline gap-2 mb-1">
+                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors">
+                              {pattern.name}
+                            </h3>
+                            <span className="text-sm text-gray-500 font-medium">
+                              {pattern.koreanName}
+                            </span>
+                          </div>
+                          <div className={`inline-block px-2 py-1 rounded-lg text-xs font-medium border ${getDifficultyColor(pattern.difficulty)}`}>
+                            {pattern.difficulty}
+                          </div>
+                        </div>
+                        
+                        <Link href={`/patterns/${pattern.id}`}>
+                          <button className="p-2 rounded-full bg-gray-50 group-hover:bg-primary-50 transition-colors">
+                            <Play className="w-5 h-5 text-gray-600 group-hover:text-primary-600 transition-colors" />
+                          </button>
+                        </Link>
+                      </div>
+                      
+                      {/* Description */}
+                      <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">
+                        {pattern.description}
+                      </p>
+                      
+                      {/* Key Techniques */}
+                      <div className="mb-4">
+                        <h4 className="text-xs font-semibold text-gray-700 mb-2 flex items-center">
+                          <Target className="w-3 h-3 mr-1" />
+                          Key Techniques
+                        </h4>
+                        <div className="flex flex-wrap gap-1">
+                          {pattern.keyPoints.slice(0, 2).map((point, idx) => {
+                            const technique = point.split('(')[0].trim();
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => toggleTechnique(technique)}
+                                className="px-2 py-1 bg-gray-100 hover:bg-primary-100 text-gray-700 hover:text-primary-700 text-xs rounded transition-colors"
+                              >
+                                {technique}
+                              </button>
+                            );
+                          })}
+                          {pattern.keyPoints.length > 2 && (
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                              +{pattern.keyPoints.length - 2} more
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Progress Actions */}
+                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleProgressToggle(pattern.id, 'learning')}
+                            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs transition-colors ${
+                              userProgress[pattern.id] === 'learning'
+                                ? 'bg-blue-100 text-blue-700'
+                                : 'bg-gray-100 text-gray-600 hover:bg-blue-50'
+                            }`}
+                          >
+                            <BookOpen className="w-3 h-3" />
+                            Learning
+                          </button>
+                          <button
+                            onClick={() => handleProgressToggle(pattern.id, 'mastered')}
+                            className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs transition-colors ${
+                              userProgress[pattern.id] === 'mastered'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-gray-100 text-gray-600 hover:bg-green-50'
+                            }`}
+                          >
+                            <Check className="w-3 h-3" />
+                            Mastered
+                          </button>
+                        </div>
+                        
+                        <Link 
+                          href={`/patterns/${pattern.id}`}
+                          className="text-xs text-primary-600 hover:text-primary-700 font-medium"
+                        >
+                          View Details →
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
                 </ScrollReveal>
               ))}
             </div>
+
+            {/* No Results */}
+            {filteredPatterns.length === 0 && (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No patterns found</h3>
+                <p className="text-gray-600 mb-4">Try adjusting your filters or search terms.</p>
+                <button
+                  onClick={() => {
+                    setSelectedBelt('all');
+                    setSelectedLevel('all');
+                    setSelectedTechniques([]);
+                    setSearchQuery('');
+                  }}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
-        {/* Learning Tips */}
-        <ScrollReveal>
-          <section className="py-16 bg-white">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8">
+        {/* Learning Tips - Updated Design */}
+        <section className="relative z-10 py-16 bg-white/80 backdrop-blur-sm">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <ScrollReveal>
+              <h2 className="text-2xl font-bold text-gray-900 mb-8">
                 Pattern Learning Tips
               </h2>
               
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <BookOpen className="w-8 h-8 text-primary-600" />
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                  <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <BookOpen className="w-6 h-6 text-primary-600" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">Study the Form</h3>
-                  <p className="text-gray-600 text-sm">
-                    Watch the video demonstrations carefully and understand each movement's purpose.
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Watch demonstrations carefully and understand each movement's purpose and application.
                   </p>
                 </div>
                 
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Target className="w-8 h-8 text-accent-600" />
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                  <div className="w-12 h-12 bg-accent-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Target className="w-6 h-6 text-accent-600" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">Practice Slowly</h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-600 text-sm leading-relaxed">
                     Master each technique slowly before attempting full speed execution.
                   </p>
                 </div>
                 
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Award className="w-8 h-8 text-primary-600" />
+                <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                  <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Award className="w-6 h-6 text-primary-600" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">Perfect with Repetition</h3>
-                  <p className="text-gray-600 text-sm">
-                    Consistent practice builds muscle memory and improves technique quality.
+                  <h3 className="text-lg font-semibold mb-2">Build Consistency</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Regular practice builds muscle memory and improves technique quality.
                   </p>
                 </div>
               </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* Login Prompt Toast */}
+        {showLoginPrompt && (
+          <div className="fixed bottom-4 right-4 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-sm">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <User className="w-4 h-4 text-primary-600" />
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 mb-1">Login to Track Progress</h4>
+                <p className="text-sm text-gray-600 mb-3">Sign in to save your learning progress and sync across devices.</p>
+                <Link href="/login" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                  Sign In →
+                </Link>
+              </div>
             </div>
-          </section>
-        </ScrollReveal>
+          </div>
+        )}
       </main>
       
       <Footer />
