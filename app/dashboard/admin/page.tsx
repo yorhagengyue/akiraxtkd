@@ -40,6 +40,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import BeltChip from '@/components/ui/BeltChip';
 import CapacityBar from '@/components/ui/CapacityBar';
 import { designTokens } from '@/lib/design-tokens';
+import { mockAdminData, shouldUseMockData, simulateApiDelay } from '@/lib/mock-data';
 
 // ========== 类型定义 ==========
 interface AdminKPIs {
@@ -118,6 +119,49 @@ function AdminDashboardContent() {
 
   const loadDashboardData = async () => {
     try {
+      // 检查是否使用 Mock 数据
+      if (shouldUseMockData()) {
+        console.log('🎭 Using mock data for Admin Dashboard');
+        
+        // 模拟 API 延迟
+        await simulateApiDelay(600);
+        
+        // 使用 Mock 数据
+        const data = mockAdminData;
+        setKpis({
+          activeStudents: data.kpis.activeStudents,
+          activeStudentsDelta: data.kpis.activeStudentsDelta,
+          occupancyRate: data.kpis.occupancyRate,
+          occupancyDelta: data.kpis.occupancyDelta,
+          arOutstanding: data.kpis.arOutstanding,
+          arDelta: data.kpis.arDelta,
+          weeklyAttendance: data.kpis.attendanceThisWeek,
+          attendanceDelta: data.kpis.attendanceDelta,
+          todaySessions: data.kpis.upcomingSessionsToday,
+          upcomingEvents: data.kpis.upcomingEvents,
+        });
+        
+        setRiskAlerts(data.riskAlerts);
+        setRecentActivities(data.recentActivities);
+        setStudentOverview(data.studentOverview.map(student => ({
+          student_id: student.id,
+          name: student.name,
+          email: student.email,
+          current_belt: student.belt.color,
+          belt_stripes: student.belt.stripes || 0,
+          enrolled_classes: student.enrolledClasses,
+          attendance_rate: student.attendanceRate,
+          last_attendance: student.lastAttendance,
+          status: student.status,
+          outstanding_balance: student.outstandingFees
+        })));
+        
+        setLoading(false);
+        success('Demo Data', 'Loaded demonstration data for Admin Dashboard');
+        return;
+      }
+
+      // 实际 API 调用（生产环境）
       const { authenticatedFetch } = await import('@/lib/auth-client');
       
       // 加载KPI数据
@@ -149,7 +193,7 @@ function AdminDashboardContent() {
       }
 
       // 加载学员概览
-              const studentsResponse = await authenticatedFetch(API_ENDPOINTS.dashboard.admin.studentsOverview());
+      const studentsResponse = await authenticatedFetch(API_ENDPOINTS.dashboard.admin.studentsOverview());
       if (studentsResponse.ok) {
         const studentsData = await studentsResponse.json();
         if (studentsData.success) {

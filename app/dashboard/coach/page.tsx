@@ -32,6 +32,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import SessionCard from '@/components/ui/SessionCard';
 import RosterTable from '@/components/ui/RosterTable';
 import { designTokens } from '@/lib/design-tokens';
+import { mockCoachData, shouldUseMockData, simulateApiDelay } from '@/lib/mock-data';
 
 // ========== 类型定义 ==========
 interface CoachKPIs {
@@ -93,7 +94,40 @@ function CoachDashboardContent() {
 
   const loadCoachData = async () => {
     try {
+      // 检查是否使用 Mock 数据
+      if (shouldUseMockData()) {
+        console.log('🎭 Using mock data for Coach Dashboard');
+        
+        // 模拟 API 延迟
+        await simulateApiDelay(500);
+        
+        // 使用 Mock 数据
+        const data = mockCoachData;
+        setKpis(data.kpis);
+        setTodaySessions(data.todaySessions);
+        
+        // 转换学员数据格式
+        const transformedStudents = data.studentRoster.map(student => ({
+          id: student.id,
+          name: student.name,
+          currentBelt: `${student.belt.color.charAt(0).toUpperCase() + student.belt.color.slice(1)} Belt${student.belt.stripes ? ` (${student.belt.stripes} stripes)` : ''}`,
+          lastAttendance: formatLastAttendance(student.recentAttendance.length > 0 ? '2025-08-23' : undefined),
+          attendanceStreak: student.recentAttendance.filter(Boolean).length,
+          classCount: student.classes.length,
+          notes: student.notes,
+          hasRisk: student.status === 'at_risk',
+          riskType: student.status === 'at_risk' ? 'absence' : undefined
+        }));
+        
+        setMyStudents(transformedStudents);
+        setLoading(false);
+        success('Demo Data', 'Loaded demonstration data for Coach Dashboard');
+        return;
+      }
+
+      // 实际 API 调用（生产环境）
       const { authenticatedFetch } = await import('@/lib/auth-client');
+      const { API_ENDPOINTS } = await import('@/lib/config');
       
       // 加载KPI数据
       const kpiResponse = await authenticatedFetch(API_ENDPOINTS.dashboard.coach.kpis());

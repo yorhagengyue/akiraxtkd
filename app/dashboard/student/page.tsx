@@ -30,6 +30,7 @@ import BillingSection from '@/components/student/BillingSection';
 import RemindersCard from '@/components/student/RemindersCard';
 import QuickActions from '@/components/student/QuickActions';
 import { API_ENDPOINTS } from '@/lib/config';
+import { mockStudentData, shouldUseMockData, simulateApiDelay } from '@/lib/mock-data';
 
 // ========== 类型定义 ==========
 interface NextSession {
