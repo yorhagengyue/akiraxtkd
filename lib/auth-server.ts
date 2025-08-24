@@ -149,14 +149,36 @@ class MockD1Database {
 }
 
 /**
- * Base64 encode for Node.js compatibility
+ * Base64 encode for Edge Runtime compatibility
  */
 function base64Encode(str: string): string {
   if (typeof btoa !== 'undefined') {
     return btoa(str);
   }
-  // Node.js fallback
-  return Buffer.from(str).toString('base64');
+  // Edge Runtime fallback - manual base64 encoding
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  let result = '';
+  let i = 0;
+  
+  while (i < str.length) {
+    const a = str.charCodeAt(i++);
+    const b = i < str.length ? str.charCodeAt(i++) : 0;
+    const c = i < str.length ? str.charCodeAt(i++) : 0;
+    
+    const bitmap = (a << 16) | (b << 8) | c;
+    
+    result += chars.charAt((bitmap >> 18) & 63);
+    result += chars.charAt((bitmap >> 12) & 63);
+    result += chars.charAt((bitmap >> 6) & 63);
+    result += chars.charAt(bitmap & 63);
+  }
+  
+  // Pad with '=' characters
+  const pad = str.length % 3;
+  if (pad === 1) result = result.slice(0, -2) + '==';
+  if (pad === 2) result = result.slice(0, -1) + '=';
+  
+  return result;
 }
 
 /**

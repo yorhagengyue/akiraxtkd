@@ -5,6 +5,8 @@
 
 import { NextRequest } from 'next/server';
 
+export const runtime = 'edge';
+
 export async function GET(request: NextRequest) {
   console.log('🧪 GET /api/test - Next.js Route Handler');
   

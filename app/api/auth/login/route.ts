@@ -6,6 +6,8 @@
 import { NextRequest } from 'next/server';
 import { handleLogin, handleCORS } from '@/lib/auth-server';
 
+export const runtime = 'edge';
+
 export async function POST(request: NextRequest) {
   console.log('🔐 POST /api/auth/login - Next.js Route Handler');
   return handleLogin(request);
