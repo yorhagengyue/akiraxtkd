@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // Enable static export for Cloudflare Pages
+  // output: 'export', // Disabled for next-on-pages compatibility
   trailingSlash: true,
   images: {
     unoptimized: true
   },
-  // Disable features that don't work with static export
   eslint: {
     ignoreDuringBuilds: true,
   },
