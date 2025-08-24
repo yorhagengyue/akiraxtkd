@@ -17,7 +17,7 @@ export default function Footer() {
           </div>
           
           <div className="text-gray-400 text-sm">
-            © 2024 Akira X Taekwondo. All rights reserved.
+            © 2024 Akira X Taekwondo 胜灵跆拳道. All rights reserved.
           </div>
         </div>
         
@@ -46,10 +46,10 @@ export default function Footer() {
             <div>
               <h4 className="font-semibold mb-3">About Us</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Our Team</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Locations</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Awards</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">News</a></li>
+                <li><a href="#about" className="hover:text-white transition-colors">Our Mission</a></li>
+                <li><a href="#about" className="hover:text-white transition-colors">Values</a></li>
+                <li><span className="text-xs">Affiliate of Singapore Taekwondo Federation</span></li>
+                <li><span className="text-xs italic">"To do better than one's best"</span></li>
               </ul>
             </div>
             

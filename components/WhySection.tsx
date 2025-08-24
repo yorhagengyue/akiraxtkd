@@ -25,7 +25,7 @@ export default function WhySection() {
   ]
 
   return (
-    <section id="why" className="py-16 bg-gradient-to-br from-gray-50 via-white to-primary-50 relative overflow-hidden">
+    <section id="about" className="py-16 bg-gradient-to-br from-gray-50 via-white to-primary-50 relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full opacity-20"></div>
@@ -33,10 +33,47 @@ export default function WhySection() {
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="text-center mb-12">
+        <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-            WHY CHOOSE US?
+            ABOUT AKIRA X TAEKWONDO
           </h2>
+          <h3 className="text-2xl font-semibold text-gray-800 mb-4">胜灵跆拳道</h3>
+          
+          {/* Brand Information */}
+          <div className="max-w-4xl mx-auto space-y-6 mb-12">
+            <p className="text-lg text-gray-700 leading-relaxed">
+              <strong className="text-primary-600">Akira X Taekwondo 胜灵跆拳道</strong> is an affiliate of the Singapore Taekwondo Federation, dedicated to promoting the art and discipline of Taekwondo with excellence and integrity.
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-8 mt-8">
+              <div className="text-center p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+                <h4 className="text-xl font-bold text-primary-600 mb-2">MOTTO</h4>
+                <p className="text-gray-700 italic">"To do better than one's best"</p>
+              </div>
+              
+              <div className="text-center p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+                <h4 className="text-xl font-bold text-accent-600 mb-2">VALUES</h4>
+                <p className="text-gray-700 font-medium">"Respect and Responsibility"</p>
+              </div>
+              
+              <div className="text-center p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+                <h4 className="text-xl font-bold text-primary-600 mb-2">MISSION</h4>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  Committed to imparting knowledge and values while building character, integrity, and discipline
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-r from-primary-50 to-accent-50 p-8 rounded-xl border border-primary-100 mt-8">
+              <h4 className="text-xl font-bold text-gray-900 mb-4">Our Mission</h4>
+              <p className="text-gray-700 leading-relaxed">
+                Akira X Taekwondo is committed to imparting the knowledge and values of Taekwondo. 
+                We place strong emphasis on character-building programs that instill <strong className="text-primary-600">integrity</strong>, 
+                <strong className="text-primary-600"> discipline</strong>, and <strong className="text-primary-600">sportsmanship</strong>, 
+                while fostering a harmonious and inclusive community spirit.
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-center">

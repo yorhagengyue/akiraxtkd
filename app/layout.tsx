@@ -7,12 +7,12 @@ import AuthProvider from '@/components/AuthProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Akira X Taekwondo - Premier Taekwondo Training',
-  description: 'Professional taekwondo academy offering world-class training programs for all ages. Expert instructors and comprehensive programs for every skill level.',
-  keywords: 'taekwondo, martial arts, Akira X, training, classes, self defense',
-  authors: [{ name: 'Akira X Taekwondo' }],
-  creator: 'Akira X Taekwondo',
-  publisher: 'Akira X Taekwondo',
+  title: 'Akira X Taekwondo 胜灵跆拳道 - Singapore Premier Academy',
+  description: 'Affiliate of Singapore Taekwondo Federation. Dedicated to promoting Taekwondo with excellence and integrity. Character-building programs that instill integrity, discipline, and sportsmanship.',
+  keywords: 'taekwondo, martial arts, Akira X, 胜灵跆拳道, Singapore Taekwondo Federation, training, classes, self defense, character building, integrity, discipline',
+  authors: [{ name: 'Akira X Taekwondo 胜灵跆拳道' }],
+  creator: 'Akira X Taekwondo 胜灵跆拳道',
+  publisher: 'Akira X Taekwondo 胜灵跆拳道',
   icons: {
     icon: [
       { url: '/img/logo.jpg', sizes: '32x32', type: 'image/jpeg' },
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_SG',
     url: 'https://akiraxtkd.pages.dev',
-    title: 'Akira X Taekwondo - Premier Taekwondo Training',
-    description: 'Professional taekwondo academy offering world-class training programs for all ages.',
+    title: 'Akira X Taekwondo 胜灵跆拳道 - Singapore Premier Academy',
+    description: 'Affiliate of Singapore Taekwondo Federation. Dedicated to promoting Taekwondo with excellence and integrity.',
     images: [
       {
         url: '/img/logo.jpg',
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Akira X Taekwondo - Premier Taekwondo Training',
-    description: 'Professional taekwondo academy offering world-class training programs for all ages.',
+    title: 'Akira X Taekwondo 胜灵跆拳道 - Singapore Premier Academy',
+    description: 'Affiliate of Singapore Taekwondo Federation. Dedicated to promoting Taekwondo with excellence and integrity.',
     images: ['/img/logo.jpg'],
   },
 }
