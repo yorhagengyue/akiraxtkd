@@ -12,42 +12,50 @@ A modern full-stack web application for taekwondo academy management with develo
 - **Animations**: Framer Motion
 - **Carousel**: Swiper.js
 - **Language**: TypeScript
-- **Deployment**: Cloudflare Pages (Static Export)
+- **Deployment**: Cloudflare Pages (next-on-pages)
 
 ### Backend
-- **Runtime**: Cloudflare Workers
+- **Runtime**: Cloudflare Workers (Edge Runtime)
+- **Framework**: Next.js Route Handlers with next-on-pages
 - **Database**: Cloudflare D1 (SQLite)
 - **API**: REST endpoints with TypeScript
-- **Authentication**: Development mode with demo accounts
+- **Authentication**: JWT tokens with demo accounts
 
 ### Development Environment
-- **Local Frontend**: http://localhost:3000 (Next.js)
-- **Local API**: http://localhost:8787 (Wrangler)
-- **Database**: Local + Remote D1 sync
+- **Local Frontend**: http://localhost:3000 (Next.js with API routes)
+- **Local API**: Integrated with Next.js dev server
+- **Database**: Mock data for development, D1 for production
+- **Edge Runtime**: Compatible with Cloudflare Workers
 
 ## Project Structure
 
 ```
 akiraxtkd.com/
 ├── app/                    # Next.js App Router
+│   ├── api/               # Next.js Route Handlers (Edge Runtime)
+│   │   ├── auth/login/    # Login endpoint
+│   │   ├── auth/logout/   # Logout endpoint
+│   │   ├── env-info/      # Environment info
+│   │   └── test/          # Test endpoint
 │   ├── login/             # Login page
 │   ├── register/          # Registration page
+│   ├── dashboard/         # Protected dashboards
+│   │   ├── admin/         # Admin dashboard
+│   │   ├── coach/         # Coach dashboard
+│   │   └── student/       # Student dashboard
 │   ├── layout.tsx         # Root layout
 │   ├── page.tsx           # Homepage
 │   └── globals.css        # Global styles
 ├── components/            # React components
 │   ├── Header.tsx         # Navigation header
 │   ├── Footer.tsx         # Site footer
-│   ├── SimpleAuthButton.tsx # Authentication UI
+│   ├── AuthProvider.tsx   # Global auth context
 │   └── [Other components] # Homepage sections
-├── functions/             # Cloudflare Workers
-│   ├── _worker.js         # Main worker entry
-│   └── api/               # API endpoints
-│       ├── auth.ts        # Authentication API
-│       ├── env-info.ts    # Environment info
-│       └── students.ts    # Student management
-├── hooks/                 # React hooks
-│   └── useSimpleAuth.tsx  # Authentication hook
+├── lib/                   # Shared utilities
+│   ├── auth-server.ts     # Server-side auth logic
+│   ├── auth-client.ts     # Client-side auth utilities
+│   └── config.ts          # API configuration
+├── functions/             # Legacy Cloudflare Workers (deprecated)
 ├── database/              # Database files
 │   ├── schema-v2.sql      # Database schema
 │   └── seed-v2.sql        # Seed data
@@ -60,26 +68,28 @@ akiraxtkd.com/
 ### Demo Accounts
 | Role | Email | Password | Access Level |
 |------|-------|----------|--------------|
-| Admin | admin@dev.local | admin123 | Full system access |
-| Coach | coach@dev.local | coach123 | Manage classes/students |
-| Student | student@dev.local | student123 | View classes/progress |
+| Admin | admin@akiraxtkd.com | admin123 | Full system access |
+| Coach | coach@akiraxtkd.com | coach123 | Manage classes/students |
+| Student | student@akiraxtkd.com | student123 | View classes/progress |
 
 ### Authentication Flow
-1. **Development Mode**: Direct login with demo accounts
-2. **Session Management**: JWT-like tokens in localStorage
-3. **API Protection**: Bearer token authentication
-4. **Role-based Access**: Admin/Coach/Student permissions
+1. **Demo Login**: Email/password authentication with hardcoded accounts
+2. **JWT Tokens**: Access and refresh token generation with Edge Runtime
+3. **Client Storage**: Tokens stored in localStorage with auto-refresh
+4. **Route Protection**: Frontend and backend role-based access control
+5. **Session Management**: Persistent login status across page refreshes
 
 ## API Endpoints
 
-### Authentication
-- `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Current user info
-- `GET /api/auth/dev-users` - Development users list
+### Authentication (Next.js Route Handlers)
+- `POST /api/auth/login` - User login with JWT token generation
+- `POST /api/auth/logout` - User logout with token blacklisting
+- `GET /api/env-info` - Environment information and configuration
 
 ### System
-- `GET /api/env-info` - Environment information
-- `GET /api/students` - Student management (example)
+- `GET /api/test` - API health check and deployment verification
+- `GET /api/dashboard/*` - Role-based dashboard data (legacy)
+- `GET /api/students` - Student management (legacy)
 
 ## Database Schema
 
@@ -119,15 +129,16 @@ DEV_USERS_ENABLED = "false"
 
 ## Key Features
 
-### ✅ Completed
-- Professional login/register pages
-- Demo account system with visible credentials
-- Consistent header/footer across all pages
-- Responsive design (desktop + mobile)
-- Development environment with hot reload
-- Database with complete schema and seed data
-- API endpoints with proper error handling
-- TypeScript throughout the stack
+### ✅ Completed (v0.2 - Next.js Route Handlers)
+- **Authentication System**: Complete JWT-based login/logout with demo accounts
+- **Next.js Route Handlers**: Edge Runtime compatible API endpoints
+- **Unified Development**: Single `npm run dev` for frontend + backend
+- **Auto-deployment**: Git push triggers Cloudflare Pages deployment
+- **Route Protection**: Frontend and backend role-based access control
+- **Session Management**: Persistent login with auto-refresh tokens
+- **Professional UI**: Clean login/register pages with consistent design
+- **Responsive Design**: Desktop + mobile compatibility
+- **TypeScript**: Complete type safety across frontend and backend
 
 ### 🚀 Ready for Extension
 - Google Sign-In integration
@@ -141,20 +152,20 @@ DEV_USERS_ENABLED = "false"
 ## Development Commands
 
 ```bash
-# Frontend development
-npm run dev                    # Start Next.js (port 3000)
+# Development (Unified)
+npm run dev                    # Start Next.js with API routes (port 3000)
 
-# Backend development  
-npm run dev:workers           # Start Cloudflare Workers (port 8787)
+# Building & Deployment
+npm run build                  # Build Next.js application with next-on-pages
+git push origin master        # Auto-deploy to Cloudflare Pages
 
-# Database management
-npm run db:schema             # Apply schema to remote DB
-npm run db:seed               # Apply seed data to remote DB
+# Database management (Legacy - for production setup)
+npm run db:schema             # Apply schema to remote D1
+npm run db:seed               # Apply seed data to remote D1
 npm run db:query -- "SELECT * FROM users"  # Run SQL query
 
-# Deployment
-npm run deploy:preview        # Deploy to preview environment
-npm run deploy:production     # Deploy to production
+# Legacy Backend (Deprecated)
+npm run dev:workers           # Start Cloudflare Workers (port 8787)
 ```
 
 ## Security Considerations
@@ -202,5 +213,16 @@ npm run deploy:production     # Deploy to production
 
 ---
 
-**Status**: ✅ Development environment fully functional
-**Next Steps**: Production setup, Google Auth integration, advanced features
+**Status**: ✅ v0.2 - Next.js Route Handlers deployment complete
+**Current Version**: demo v0.2 - Next.js Route Handlers
+**Deployment**: Cloudflare Pages with next-on-pages
+**Next Steps**: D1 database integration, advanced dashboards, production features
+
+### Recent Updates (v0.2)
+- ✅ Migrated from Cloudflare Pages Functions to Next.js Route Handlers
+- ✅ Added Edge Runtime compatibility for all API endpoints
+- ✅ Unified development experience with single dev server
+- ✅ Fixed deployment issues with proper runtime configuration
+- ✅ Updated demo accounts to @akiraxtkd.com domain
+- ✅ Implemented persistent authentication state
+- ✅ Auto-deployment pipeline working correctly
