@@ -7,6 +7,27 @@
 const isDevelopment = process.env.NODE_ENV === 'development';
 const isProduction = process.env.NODE_ENV === 'production';
 
+// 检测运行环境
+function detectEnvironment() {
+  if (typeof window === 'undefined') {
+    // 服务器端
+    return isDevelopment ? 'development' : 'production';
+  }
+  
+  // 客户端环境检测
+  const hostname = window.location.hostname;
+  
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'development';
+  }
+  
+  if (hostname.includes('preview') || hostname.includes('staging')) {
+    return 'preview';
+  }
+  
+  return 'production';
+}
+
 // API基础URL配置
 export const API_CONFIG = {
   // 开发环境使用本地Wrangler服务器
@@ -15,37 +36,43 @@ export const API_CONFIG = {
     workers: 'http://localhost:8787',
   },
   
-  // 生产环境使用实际的Cloudflare Workers
+  // 生产环境使用相对路径（与前端同域名）
   production: {
-    baseUrl: 'https://akiraxtkd.gengy.workers.dev', // 替换为您的实际Workers域名
-    workers: 'https://akiraxtkd.gengy.workers.dev',
+    baseUrl: '', // 使用相对路径，与Pages部署在同一域名
+    workers: '', // Cloudflare Pages Functions会处理API路由
   },
   
-  // 预览环境
+  // 预览环境也使用相对路径
   preview: {
-    baseUrl: 'https://akiraxtkd-preview.gengy.workers.dev', // 替换为您的预览Workers域名
-    workers: 'https://akiraxtkd-preview.gengy.workers.dev',
+    baseUrl: '', // 使用相对路径，与预览部署在同一域名
+    workers: '',
   }
 };
 
 // 获取当前环境的API配置
 export function getApiConfig() {
-  if (isDevelopment) {
-    return API_CONFIG.development;
-  }
+  const env = detectEnvironment();
   
-  // 检查是否为预览环境
-  if (typeof window !== 'undefined' && window.location.hostname.includes('preview')) {
-    return API_CONFIG.preview;
+  switch (env) {
+    case 'development':
+      return API_CONFIG.development;
+    case 'preview':
+      return API_CONFIG.preview;
+    default:
+      return API_CONFIG.production;
   }
-  
-  return API_CONFIG.production;
 }
 
 // 构建完整的API URL
 export function buildApiUrl(endpoint: string): string {
   const config = getApiConfig();
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+  
+  // 如果baseUrl为空（生产环境），使用相对路径
+  if (!config.baseUrl) {
+    return `/api/${cleanEndpoint}`;
+  }
+  
   return `${config.baseUrl}/api/${cleanEndpoint}`;
 }
 

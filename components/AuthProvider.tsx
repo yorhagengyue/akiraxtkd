@@ -4,6 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { isAuthenticated, getStoredUser, setupAutoRefresh, initAuth } from '@/lib/auth-client';
 
+// Import debug utilities in development
+if (process.env.NODE_ENV === 'development') {
+  import('@/lib/debug');
+}
+
 interface AuthProviderProps {
   children: React.ReactNode;
 }
