@@ -2,8 +2,79 @@ name = "akiraxtkd"
 compatibility_date = "2024-01-01"
 compatibility_flags = ["nodejs_compat"]
 
+# Entry point for Cloudflare Workers
+main = "functions/_worker.js"
+
+# Default environment variables
+[vars]
+ENVIRONMENT = "development"
+APP_NAME = "Akira X Taekwondo"
+CONTACT_EMAIL = "teamakiraxtaekwondo@gmail.com"
+WHATSAPP_NUMBER = "+6587668794"
+DEV_MODE = "true"
+AUTH_ENABLED = "false"
+DEV_USERS_ENABLED = "true"
+JWT_SECRET = "dev-jwt-secret-key-change-in-production-2024"
+
+# Default development database
+[[d1_databases]]
+binding = "DB"
+database_name = "akiraxtkd-db-dev"
+database_id = "b1522b79-7afc-48f6-aea1-956e2da145cb"
+
+# Development environment
+[env.development]
+compatibility_flags = ["nodejs_compat"]
+
+[env.development.vars]
+ENVIRONMENT = "development"
+APP_NAME = "Akira X Taekwondo"
+CONTACT_EMAIL = "teamakiraxtaekwondo@gmail.com"
+WHATSAPP_NUMBER = "+6587668794"
+DEV_MODE = "true"
+AUTH_ENABLED = "false"
+DEV_USERS_ENABLED = "true"
+JWT_SECRET = "dev-jwt-secret-key-change-in-production-2024"
+
+[[env.development.d1_databases]]
+binding = "DB"
+database_name = "akiraxtkd-db-dev"
+database_id = "b1522b79-7afc-48f6-aea1-956e2da145cb"
+
+# Production environment
 [env.production]
 compatibility_flags = ["nodejs_compat"]
 
-[env.preview]  
+[env.production.vars]
+ENVIRONMENT = "production"
+APP_NAME = "Akira X Taekwondo"
+CONTACT_EMAIL = "teamakiraxtaekwondo@gmail.com"
+WHATSAPP_NUMBER = "+6587668794"
+DEV_MODE = "false"
+AUTH_ENABLED = "true"
+DEV_USERS_ENABLED = "false"
+JWT_SECRET = "production-jwt-secret-key-CHANGE-THIS-IN-PRODUCTION"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "akiraxtkd-db"
+database_id = ""  # Will be created later for production
+
+# Preview environment
+[env.preview]
 compatibility_flags = ["nodejs_compat"]
+
+[env.preview.vars]
+ENVIRONMENT = "preview"
+APP_NAME = "Akira X Taekwondo"
+CONTACT_EMAIL = "teamakiraxtaekwondo@gmail.com"
+WHATSAPP_NUMBER = "+6587668794"
+DEV_MODE = "false"
+AUTH_ENABLED = "true"
+DEV_USERS_ENABLED = "false"
+JWT_SECRET = "preview-jwt-secret-key-for-testing-2024"
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "akiraxtkd-db-preview"
+database_id = ""  # Will be created later for preview

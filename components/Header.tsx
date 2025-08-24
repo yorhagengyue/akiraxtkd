@@ -1,10 +1,95 @@
 'use client'
 
-import { useState } from 'react'
-import { Menu, X, Search } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Menu, X, Search, User, LogOut, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Header() {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+
+  // 检查登录状态
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const { isAuthenticated: checkAuth, getStoredUser } = await import('@/lib/auth-client')
+        
+        if (checkAuth()) {
+          const userData = getStoredUser()
+          setUser(userData)
+          setIsAuthenticated(true)
+        } else {
+          setUser(null)
+          setIsAuthenticated(false)
+        }
+      } catch (err) {
+        console.error('Header auth check error:', err)
+        setUser(null)
+        setIsAuthenticated(false)
+      }
+    }
+
+    checkAuthStatus()
+    
+    // 监听存储变化，当用户登录/登出时更新状态
+    const handleStorageChange = () => {
+      checkAuthStatus()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    
+    // 也监听自定义事件，用于同一页面内的登录状态变化
+    window.addEventListener('authStateChanged', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('authStateChanged', handleStorageChange)
+    }
+  }, [])
+
+  // 点击外部关闭用户菜单
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showUserMenu) {
+        const target = event.target as HTMLElement
+        if (!target.closest('.user-menu-container')) {
+          setShowUserMenu(false)
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showUserMenu])
+
+  const handleLogout = async () => {
+    try {
+      const { logout } = await import('@/lib/auth-client')
+      await logout()
+      setUser(null)
+      setIsAuthenticated(false)
+      setShowUserMenu(false)
+      
+      // 触发自定义事件通知其他组件
+      window.dispatchEvent(new CustomEvent('authStateChanged'))
+      
+      router.push('/')
+    } catch (err) {
+      console.error('Logout error:', err)
+    }
+  }
+
+  const getDashboardPath = () => {
+    if (!user) return '/login'
+    
+    return user.role === 'admin' ? '/dashboard/admin' :
+           user.role === 'coach' ? '/dashboard/coach' :
+           '/dashboard/student'
+  }
 
   const navItems = [
     { name: 'Welcome', href: '#welcome' },
@@ -53,34 +138,92 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            {navItems.map((item, index) => (
-              <div key={item.name} className="relative group">
-                <a
-                  href={item.href}
-                  className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative hover:-translate-y-0.5"
-                >
-                  {item.name}
-                  <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary-600 to-accent-600 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
-                </a>
-                {item.submenu && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                    <div className="py-2">
-                      {item.submenu.map((subItem) => (
-                        <a
-                          key={subItem.name}
-                          href={subItem.href}
-                          className="block px-4 py-3 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors rounded-lg mx-2 hover:translate-x-1 transition-transform duration-200"
-                        >
-                          {subItem.name}
-                        </a>
-                      ))}
+          <div className="hidden md:flex items-center space-x-6">
+            <nav className="flex space-x-8">
+              {navItems.map((item, index) => (
+                <div key={item.name} className="relative group">
+                  <a
+                    href={item.href}
+                    className="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-300 relative hover:-translate-y-0.5"
+                  >
+                    {item.name}
+                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-primary-600 to-accent-600 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                  </a>
+                  {item.submenu && (
+                    <div className="absolute left-0 mt-2 w-48 bg-white/95 backdrop-blur-md rounded-xl shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                      <div className="py-2">
+                        {item.submenu.map((subItem) => (
+                          <a
+                            key={subItem.name}
+                            href={subItem.href}
+                            className="block px-4 py-3 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-600 transition-colors rounded-lg mx-2 hover:translate-x-1 transition-transform duration-200"
+                          >
+                            {subItem.name}
+                          </a>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </nav>
+                  )}
+                </div>
+              ))}
+            </nav>
+            
+            {/* Auth Button and Links */}
+            <div className="flex items-center space-x-4">
+              {isAuthenticated && user ? (
+                <div className="relative user-menu-container">
+                  <button
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm font-medium text-gray-900">{user.display_name}</div>
+                      <div className="text-xs text-gray-500 capitalize">{user.role}</div>
+                    </div>
+                  </button>
+
+                  {/* User Dropdown Menu */}
+                  {showUserMenu && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50">
+                      <Link
+                        href={getDashboardPath()}
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Link 
+                    href="/login"
+                    className="text-sm text-gray-700 hover:text-primary-600 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    href="/register"
+                    className="text-sm bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
 
           {/* Mobile menu button */}
           <button
@@ -128,6 +271,56 @@ export default function Header() {
                   )}
                 </div>
               ))}
+              
+              {/* Mobile Auth Links */}
+              <div className="px-4 py-3 border-t border-gray-200 mt-4 space-y-2">
+                {isAuthenticated && user ? (
+                  <>
+                    <div className="flex items-center space-x-3 px-4 py-3 bg-gray-50 rounded-lg">
+                      <div className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{user.display_name}</div>
+                        <div className="text-xs text-gray-500 capitalize">{user.role}</div>
+                      </div>
+                    </div>
+                    <Link 
+                      href={getDashboardPath()}
+                      className="block w-full text-center py-2 px-4 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Go to Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout()
+                        setIsMenuOpen(false)
+                      }}
+                      className="block w-full text-center py-2 px-4 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link 
+                      href="/login"
+                      className="block w-full text-center py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                    <Link 
+                      href="/register"
+                      className="block w-full text-center py-2 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Register
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}

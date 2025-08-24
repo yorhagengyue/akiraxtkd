@@ -1,3 +1,5 @@
+import PlaceholderImage from '@/components/PlaceholderImage'
+
 export default function ClassesSection() {
   const classes = [
     {
@@ -5,7 +7,7 @@ export default function ClassesSection() {
       ageRange: "8pm to 9pm",
       location: "604 Tampines Avenue 9",
       description: "Weekly taekwondo training sessions with focus on technique and discipline",
-      image: "https://via.placeholder.com/400x300/3b82f6/ffffff?text=Monday+Classes",
+      color: '#3b82f6', // Blue
       features: ["Technical training", "Belt progression", "Fitness development", "Character building"]
     },
     {
@@ -13,7 +15,7 @@ export default function ClassesSection() {
       ageRange: "7:30pm to 8:30pm",
       location: "211C Compassvale Lane",
       description: "Mid-week training focusing on forms and sparring techniques",
-      image: "https://via.placeholder.com/400x300/2563eb/ffffff?text=Tuesday+Classes",
+      color: '#2563eb', // Blue
       features: ["Poomsae practice", "Sparring techniques", "Flexibility training", "Mental focus"]
     },
     {
@@ -21,7 +23,7 @@ export default function ClassesSection() {
       ageRange: "7:30pm to 9pm",
       location: "217C Compassvale Drive",
       description: "Extended training session with comprehensive skill development",
-      image: "https://via.placeholder.com/400x300/1d4ed8/ffffff?text=Thursday+Classes",
+      color: '#1e3a8a', // Dark Blue
       features: ["Extended practice", "Advanced techniques", "Competition prep", "Strength building"]
     },
     {
@@ -29,7 +31,7 @@ export default function ClassesSection() {
       ageRange: "6:30pm to 8pm & 8pm to 9:30pm",
       location: "Fengshan CC, Bedok North Street 2",
       description: "Two Friday sessions - fundamentals and advanced training",
-      image: "https://via.placeholder.com/400x300/1e3a8a/ffffff?text=Friday+Classes",
+      color: '#374151', // Gray
       features: ["Fundamental techniques", "Advanced sparring", "Competition training", "Flexible timing"]
     },
     {
@@ -37,7 +39,7 @@ export default function ClassesSection() {
       ageRange: "Time TBA",
       location: "207A Compassvale Lane",
       description: "Weekend training sessions for all skill levels",
-      image: "https://via.placeholder.com/400x300/f59e0b/ffffff?text=Saturday+Classes",
+      color: '#f59e0b', // Amber
       features: ["Weekend training", "All skill levels", "Flexible practice", "Community building"]
     }
   ]
@@ -67,8 +69,14 @@ export default function ClassesSection() {
               key={index}
               className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 group hover:scale-105"
             >
-              <div className="h-48 bg-cover bg-center relative overflow-hidden" 
-                   style={{ backgroundImage: `url(${classItem.image})` }}>
+              <div className="h-48 relative overflow-hidden">
+                <PlaceholderImage
+                  width={400}
+                  height={192}
+                  text={classItem.name}
+                  color={classItem.color}
+                  className="w-full h-full object-cover"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent group-hover:from-primary-900/80 transition-all duration-300"></div>
                 <div className="absolute bottom-4 left-4 text-white group-hover:-translate-y-1 transition-transform duration-200">
                   <h3 className="text-xl font-bold group-hover:text-accent-400 transition-colors">

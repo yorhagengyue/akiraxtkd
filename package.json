@@ -6,15 +6,22 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "export": "next export"
+    "export": "next export",
+    "dev:workers": "wrangler dev --env development",
+    "test:auth": "node scripts/test-auth-api.js",
+    "db:schema": "wrangler d1 execute akiraxtkd-db-dev --file=database/schema-v2.sql --remote",
+    "db:seed": "wrangler d1 execute akiraxtkd-db-dev --file=database/seed-v2.sql --remote",
+    "db:query": "wrangler d1 execute akiraxtkd-db-dev --command",
+    "deploy:preview": "wrangler deploy --env preview",
+    "deploy:production": "wrangler deploy --env production"
   },
   "dependencies": {
+    "framer-motion": "^10.18.0",
+    "lucide-react": "^0.292.0",
     "next": "^14.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "swiper": "^11.0.0",
-    "lucide-react": "^0.292.0",
-    "framer-motion": "^10.16.0"
+    "swiper": "^11.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
