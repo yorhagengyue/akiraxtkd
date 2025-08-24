@@ -92,14 +92,14 @@ export default function Header() {
   }
 
   const navItems = [
-    { name: 'Welcome', href: '#welcome' },
+    { name: 'Welcome', href: '/#welcome' },
     { 
       name: 'About', 
-      href: '#about',
+      href: '/about',
       submenu: [
-        { name: 'Introduction', href: '#introduction' },
-        { name: 'Our Team & Coaches', href: '#team' },
-        { name: 'Locations', href: '#locations' }
+        { name: 'Introduction', href: '/about' },
+        { name: 'Our Team & Coaches', href: '/about#team' },
+        { name: 'Locations', href: '/#contact' }
       ]
     },
     {
@@ -117,9 +117,9 @@ export default function Header() {
         { name: 'Taeguek Pal (8) Jang', href: '/patterns/taeguek-pal-jang' }
       ]
     },
-    { name: 'Classes', href: '#classes' },
-    { name: 'News', href: '#news' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Classes', href: '/#classes' },
+    { name: 'News', href: '/#news' },
+    { name: 'Contact', href: '/#contact' }
   ]
 
   return (
