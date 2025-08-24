@@ -14,9 +14,9 @@ import AnimatedPage from '@/components/animations/AnimatedPage';
 import { ToastContainer, useToast } from '@/components/animations/Toast';
 
 const demoAccounts = [
-  { role: 'Admin', email: 'admin@dev.local', password: 'admin123' },
-  { role: 'Coach', email: 'coach@dev.local', password: 'coach123' },
-  { role: 'Student', email: 'student@dev.local', password: 'student123' },
+  { role: 'Admin', email: 'admin@akiraxtkd.com', password: 'admin123' },
+  { role: 'Coach', email: 'coach@akiraxtkd.com', password: 'coach123' },
+  { role: 'Student', email: 'student@akiraxtkd.com', password: 'student123' },
 ];
 
 export default function LoginPage() {
@@ -174,11 +174,11 @@ export default function LoginPage() {
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <div className="mb-6">
-                  <h2 className="text-lg font-bold text-gray-900 mb-1">Akira X Taekwondo</h2>
-                  <p className="text-sm text-gray-500">Singapore Premier Academy</p>
-                  <p className="text-xs text-blue-600 font-medium mt-1">demo v0.1</p>
-                </div>
+                          <div className="mb-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-1">Akira X Taekwondo</h2>
+            <p className="text-sm text-gray-500">Singapore Premier Academy</p>
+            <p className="text-xs text-blue-600 font-medium mt-1">demo v0.2 - Next.js Route Handlers</p>
+          </div>
                 <h1 className="mb-2 text-2xl font-bold text-gray-900">Sign In</h1>
                 <p className="text-gray-600">Enter your credentials to continue</p>
               </div>

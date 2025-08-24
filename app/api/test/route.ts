@@ -12,8 +12,9 @@ export async function GET(request: NextRequest) {
     success: true,
     message: 'Next.js Route Handlers with next-on-pages is working!',
     timestamp: new Date().toISOString(),
-    version: 'next-on-pages v1.0',
+    version: 'next-on-pages v0.2',
     environment: process.env.NODE_ENV || 'development',
+    deployment_trigger: 'auto-deploy-test',
   }), {
     status: 200,
     headers: {
