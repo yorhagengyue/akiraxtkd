@@ -9,7 +9,7 @@ const preliminaryPattern = {
   name: 'Preliminary Poomsae',
   koreanName: '기본 품새',
   beltLevel: 'White Belt',
-  beltColor: '#ffffff',
+  beltColor: '#e5e7eb',
   description: 'The foundational pattern for all Taekwondo students, focusing on basic stances, blocks, and strikes.',
   keyPoints: [
     'Walking stance (앞서기)',

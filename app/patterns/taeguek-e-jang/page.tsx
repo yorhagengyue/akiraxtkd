@@ -8,8 +8,8 @@ const taeguekejangPattern = {
   id: 'taeguek-e-jang',
   name: 'Taeguek E (2) Jang',
   koreanName: '태극 이장',
-  beltLevel: 'Yellow Belt with Green Stripe',
-  beltColor: '#ffd700',
+  beltLevel: 'Yellow Belt with Green Tip',
+  beltColor: '#fbbf24',
   description: 'The second Taeguek pattern, representing "Tae" which symbolizes joyfulness, serenity, and inner strength.',
   keyPoints: [
     'Inner forearm block (안팔목막기)',

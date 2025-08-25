@@ -1,0 +1,25 @@
+warning: in the working copy of 'app/patterns/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/patterns/taeguek-chil-jang/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/patterns/taeguek-e-jang/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/patterns/taeguek-il-jang/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/patterns/taeguek-o-jang/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/patterns/taeguek-pal-jang/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/patterns/taeguek-sa-jang/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/patterns/taeguek-yuk-jang/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/PatternPage.tsx', LF will be replaced by CRLF the next time Git touches it
+README-BACKEND.md
+app/patterns/page.tsx
+app/patterns/preliminary/page.tsx
+app/patterns/taeguek-chil-jang/page.tsx
+app/patterns/taeguek-e-jang/page.tsx
+app/patterns/taeguek-il-jang/page.tsx
+app/patterns/taeguek-o-jang/page.tsx
+app/patterns/taeguek-pal-jang/page.tsx
+app/patterns/taeguek-sa-jang/page.tsx
+app/patterns/taeguek-sam-jang/page.tsx
+app/patterns/taeguek-yuk-jang/page.tsx
+components/PatternPage.tsx
+docs/api-endpoints.md
+hooks/useStudents.ts
+lib/api.ts
+types/database.ts

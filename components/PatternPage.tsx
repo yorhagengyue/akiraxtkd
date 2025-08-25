@@ -253,7 +253,7 @@ export default function PatternPage({ pattern }: PatternPageProps) {
             <div className="lg:col-span-4">
               <div className="space-y-6">
                 {/* Key Techniques */}
-                <ScrollReveal delay={200}>
+                <ScrollReveal>
                   <div className="bg-white rounded-xl shadow-lg overflow-hidden translate-y-0">
                     <div className="p-6 border-b border-gray-100">
                       <h3 className="text-xl font-bold text-gray-900 flex items-center">
@@ -278,7 +278,7 @@ export default function PatternPage({ pattern }: PatternPageProps) {
 
                 {/* Pattern Meaning */}
                 {pattern.meaning && (
-                  <ScrollReveal delay={300}>
+                  <ScrollReveal>
                     <div className="bg-white rounded-xl shadow-lg overflow-hidden translate-y-0">
                       <div className="p-6 border-b border-gray-100">
                         <h3 className="text-xl font-bold text-gray-900 flex items-center">

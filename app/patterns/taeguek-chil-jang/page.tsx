@@ -9,7 +9,7 @@ const taeguekchiljangPattern = {
   name: 'Taeguek Chil (7) Jang',
   koreanName: '태극 칠장',
   beltLevel: 'Red Belt',
-  beltColor: '#ff0000',
+  beltColor: '#ef4444',
   description: 'The seventh Taeguek pattern, representing "Gan" which symbolizes mountain - ponderance, firmness, and immovability.',
   keyPoints: [
     'Tiger stance (범서기)',

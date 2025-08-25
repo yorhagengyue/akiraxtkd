@@ -8,8 +8,8 @@ const taeguekyukjangPattern = {
   id: 'taeguek-yuk-jang',
   name: 'Taeguek Yuk (6) Jang',
   koreanName: '태극 육장',
-  beltLevel: 'Blue Belt with Red Stripe',
-  beltColor: '#0000ff',
+  beltLevel: 'Blue Belt with Red Tip',
+  beltColor: '#3b82f6',
   description: 'The sixth Taeguek pattern, representing "Gam" which symbolizes water - flowing, persistent, and adaptable.',
   keyPoints: [
     'High block (위막기)',

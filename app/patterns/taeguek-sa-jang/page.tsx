@@ -8,8 +8,8 @@ const taegueksajangPattern = {
   id: 'taeguek-sa-jang',
   name: 'Taeguek Sa (4) Jang',
   koreanName: '태극 사장',
-  beltLevel: 'Green Belt with Blue Stripe',
-  beltColor: '#008000',
+  beltLevel: 'Green Belt with Blue Tip',
+  beltColor: '#22c55e',
   description: 'The fourth Taeguek pattern, representing "Jin" which symbolizes thunder, great power, and dignity.',
   keyPoints: [
     'Double forearm block (쌍팔목막기)',

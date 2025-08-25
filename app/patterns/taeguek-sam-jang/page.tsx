@@ -9,7 +9,7 @@ const taeguekSamJangPattern = {
   name: 'Taeguek Sam (3) Jang',
   koreanName: '태극 삼장',
   beltLevel: 'Green Belt',
-  beltColor: '#008000',
+  beltColor: '#22c55e',
   description: 'The third Taeguek pattern, representing "Ra" which symbolizes fire, sun, and heat - bringing passion and energy to your techniques.',
   keyPoints: [
     'Double knife hand block (쌍수도막기)',

@@ -9,7 +9,7 @@ const taeguekiljangPattern = {
   name: 'Taeguek IL Jang',
   koreanName: '태극 일장',
   beltLevel: 'Yellow Belt',
-  beltColor: '#ffd700',
+  beltColor: '#fbbf24',
   description: 'The first Taeguek pattern, representing "Keon" which symbolizes heaven and light - the beginning of all creation.',
   keyPoints: [
     'Walking stance (앞서기)',

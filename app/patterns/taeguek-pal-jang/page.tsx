@@ -8,8 +8,8 @@ const taeguekpaljangPattern = {
   id: 'taeguek-pal-jang',
   name: 'Taeguek Pal (8) Jang',
   koreanName: '태극 팔장',
-  beltLevel: 'Red Belt with Black Stripe',
-  beltColor: '#ff0000',
+  beltLevel: 'Red Belt with Black Tip',
+  beltColor: '#ef4444',
   description: 'The eighth and final Taeguek pattern, representing "Gon" which symbolizes earth - the foundation and source of all life.',
   keyPoints: [
     'Complex combinations',

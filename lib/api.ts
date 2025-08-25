@@ -305,3 +305,4 @@ export function handleApiError(error: any) {
   // Handle network or other errors
   return 'An unexpected error occurred. Please try again.';
 }
+

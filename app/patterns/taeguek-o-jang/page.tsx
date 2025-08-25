@@ -9,7 +9,7 @@ const taeguekojangPattern = {
   name: 'Taeguek O (5) Jang',
   koreanName: '태극 오장',
   beltLevel: 'Blue Belt',
-  beltColor: '#0000ff',
+  beltColor: '#3b82f6',
   description: 'The fifth Taeguek pattern, representing "Seon" which symbolizes wind - gentle but sometimes violent and penetrating.',
   keyPoints: [
     'Hammer fist strike (메주먹치기)',
