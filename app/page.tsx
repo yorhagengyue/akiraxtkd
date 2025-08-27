@@ -1,6 +1,7 @@
 import Header from '@/components/Header'
 import HeroCarousel from '@/components/HeroCarousel'
 import WhySection from '@/components/WhySection'
+import TeamSection from '@/components/TeamSection'
 import ClassesSection from '@/components/ClassesSection'
 import AwardsSection from '@/components/AwardsSection'
 import ContactSection from '@/components/ContactSection'
@@ -23,6 +24,10 @@ export default function Home() {
         
         <ScrollReveal>
           <WhySection />
+        </ScrollReveal>
+        
+        <ScrollReveal>
+          <TeamSection />
         </ScrollReveal>
         
         <ScrollReveal>
