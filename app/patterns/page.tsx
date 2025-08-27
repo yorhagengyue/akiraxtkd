@@ -372,7 +372,15 @@ export default function PatternsPage() {
             <div className="space-y-8">
               {/* Belt Level Sections */}
               {['White Belt', 'Yellow Belt', 'Green Belt', 'Blue Belt', 'Red Belt'].map(beltLevel => {
-                const beltPatterns = filteredPatterns.filter(p => p.beltLevel.includes(beltLevel.split(' ')[0]));
+                // More precise filtering to avoid duplicates
+                const beltPatterns = filteredPatterns.filter(p => {
+                  if (beltLevel === 'White Belt') return p.beltLevel === 'White Belt';
+                  if (beltLevel === 'Yellow Belt') return p.beltLevel.startsWith('Yellow Belt');
+                  if (beltLevel === 'Green Belt') return p.beltLevel.startsWith('Green Belt');
+                  if (beltLevel === 'Blue Belt') return p.beltLevel.startsWith('Blue Belt');
+                  if (beltLevel === 'Red Belt') return p.beltLevel.startsWith('Red Belt');
+                  return false;
+                });
                 if (beltPatterns.length === 0) return null;
                 
                 return (
