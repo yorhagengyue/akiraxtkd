@@ -1,6 +1,6 @@
 /**
- * Student Dashboard - 友善事务型主页
- * 专注于上课提醒、请假/补课、比赛通知、公告&账单
+ * Student Dashboard - 简化版学生面板
+ * 专注于基本信息查看：课程安排、出勤记录、腰带进度、公告
  */
 
 'use client';
@@ -11,465 +11,510 @@ import {
   Bell,
   LogOut,
   Calendar,
-  Users,
-  Trophy,
-  MessageSquare,
-  CreditCard,
-  Clock
+  Award,
+  Clock,
+  MapPin,
+  User,
+  TrendingUp,
+  CheckCircle,
+  AlertCircle,
+  BookOpen
 } from 'lucide-react';
 import AnimatedPage from '@/components/animations/AnimatedPage';
 import ScrollReveal from '@/components/animations/ScrollReveal';
 import { useToast } from '@/components/animations/Toast';
 import RouteProtection from '@/lib/route-protection';
-import PageHeader from '@/components/ui/PageHeader';
-import NextSessionCard from '@/components/student/NextSessionCard';
-import ThisWeekList from '@/components/student/ThisWeekList';
-import CompetitionsSection from '@/components/student/CompetitionsSection';
-import AnnouncementsSection from '@/components/student/AnnouncementsSection';
-import BillingSection from '@/components/student/BillingSection';
-import RemindersCard from '@/components/student/RemindersCard';
-import QuickActions from '@/components/student/QuickActions';
-import { API_ENDPOINTS } from '@/lib/config';
-import { mockStudentData, shouldUseMockData, simulateApiDelay } from '@/lib/mock-data';
 
-// ========== 类型定义 ==========
-interface NextSession {
-  id: string;
-  className: string;
-  date: string;
-  time: string;
-  location: string;
-  instructor: string;
-  checkinWindow: string;
-  equipmentReminder: string;
-  status: 'upcoming' | 'today' | 'in_progress';
-  canRequestLeave: boolean;
-  hasLeaveRequest?: {
-    status: 'pending' | 'approved' | 'rejected';
-    reason: string;
+// 简化的数据类型
+interface StudentDashboardData {
+  profile: {
+    name: string;
+    studentCode: string;
+    currentBelt: string;
+    beltColor: string;
+    joinedDate: string;
   };
-}
-
-interface WeekSession {
-  id: string;
-  className: string;
-  date: string;
-  dayName: string;
-  time: string;
-  location: string;
-  instructor: string;
-  status: 'upcoming' | 'today' | 'completed' | 'absent' | 'leave_requested' | 'makeup';
-  canRequestLeave: boolean;
-  leaveRequest?: {
-    status: 'pending' | 'approved' | 'rejected';
-    reason: string;
+  upcomingClasses: Array<{
+    className: string;
+    date: string;
+    time: string;
+    venue: string;
+    instructor: string;
+  }>;
+  attendanceRecord: Array<{
+    date: string;
+    className: string;
+    status: 'present' | 'absent' | 'late';
+  }>;
+  beltProgress: {
+    current: string;
+    next: string;
+    progress: number;
   };
-}
-
-interface Competition {
-  id: string;
-  name: string;
-  date: string;
-  location: string;
-  registrationDeadline: string;
-  daysUntilDeadline: number;
-  status: 'open' | 'closing_soon' | 'closed' | 'completed';
-  description?: string;
-  eligibleDivisions: string[];
-}
-
-interface MyRegistration {
-  id: string;
-  competitionName: string;
-  division: string;
-  status: 'pending' | 'confirmed' | 'withdrawn' | 'completed';
-  registrationDate: string;
-  weighInRequired: boolean;
-  weighInDate?: string;
-  checkInTime?: string;
-  notes?: string;
-}
-
-interface Announcement {
-  id: string;
-  title: string;
-  content: string;
-  type: 'general' | 'class' | 'competition' | 'billing' | 'emergency';
-  priority: 'low' | 'normal' | 'high' | 'urgent';
-  author: string;
-  publishedAt: string;
-  isRead: boolean;
-  audience: string;
-  hasAttachment?: boolean;
-}
-
-interface OutstandingInvoice {
-  id: string;
-  invoiceNumber: string;
-  amount: number;
-  currency: string;
-  dueDate: string;
-  daysOverdue: number;
-  purpose: string;
-  description?: string;
-  status: 'pending' | 'overdue' | 'due_soon';
-}
-
-interface ReminderSettings {
-  nextSession24h: boolean;
-  nextSession2h: boolean;
-  competitionDeadline: boolean;
-  announcementNew: boolean;
-  invoiceDue: boolean;
-  channel: 'email' | 'whatsapp' | 'both';
+  announcements: Array<{
+    title: string;
+    content: string;
+    date: string;
+    priority: 'low' | 'medium' | 'high';
+  }>;
 }
 
 function StudentDashboardContent() {
   const { success, error } = useToast();
   const router = useRouter();
-  
-  // ========== 状态管理 ==========
-  const [nextSession, setNextSession] = useState<NextSession | null>(null);
-  const [weekSessions, setWeekSessions] = useState<WeekSession[]>([]);
-  const [competitions, setCompetitions] = useState<Competition[]>([]);
-  const [myRegistrations, setMyRegistrations] = useState<MyRegistration[]>([]);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [outstandingInvoices, setOutstandingInvoices] = useState<OutstandingInvoice[]>([]);
-  const [reminderSettings, setReminderSettings] = useState<ReminderSettings>({
-    nextSession24h: true,
-    nextSession2h: true,
-    competitionDeadline: true,
-    announcementNew: true,
-    invoiceDue: true,
-    channel: 'email'
-  });
   const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<StudentDashboardData | null>(null);
 
-  // ========== 数据加载 ==========
   useEffect(() => {
-    loadStudentHome();
+    loadStudentData();
   }, []);
 
-  const loadStudentHome = async () => {
+  const loadStudentData = async () => {
     try {
-      const { authenticatedFetch } = await import('@/lib/auth-client');
+      setLoading(true);
       
-      // 加载学员主页聚合数据
-      const homeResponse = await authenticatedFetch(API_ENDPOINTS.dashboard.student.overview());
-      if (homeResponse.ok) {
-        const homeData = await homeResponse.json();
-        if (homeData.success) {
-          const data = homeData.data;
-          
-          // 设置下一节课
-          if (data.nextSession) {
-            setNextSession({
-              id: data.nextSession.session_id,
-              className: data.nextSession.class_name,
-              date: formatDate(data.nextSession.date),
-              time: `${data.nextSession.start_time} - ${data.nextSession.end_time}`,
-              location: data.nextSession.venue_name,
-              instructor: data.nextSession.instructor_name,
-              checkinWindow: '30 minutes before class',
-              equipmentReminder: 'Bring your belt and protective gear',
-              status: getSessionStatus(data.nextSession.date),
-              canRequestLeave: true,
-              hasLeaveRequest: data.nextSession.leave_request
-            });
+      // 使用简化的Mock数据
+      const mockData: StudentDashboardData = {
+        profile: {
+          name: 'Demo Student',
+          studentCode: 'AXT2024001',
+          currentBelt: 'Green Belt',
+          beltColor: '#22c55e',
+          joinedDate: '2024-01-15'
+        },
+        upcomingClasses: [
+          {
+            className: 'Monday Evening Class',
+            date: '2024-12-23',
+            time: '8:00 PM - 9:00 PM',
+            venue: 'Tampines Training Center',
+            instructor: 'Jasterfer Kellen'
+          },
+          {
+            className: 'Thursday Practice',
+            date: '2024-12-26',
+            time: '7:30 PM - 9:00 PM',
+            venue: 'Compassvale Drive',
+            instructor: 'Jasterfer Kellen'
           }
-
-          // 设置本周课程
-          if (data.weekSessions && Array.isArray(data.weekSessions)) {
-            setWeekSessions(data.weekSessions.map((session: any) => ({
-              id: session.session_id,
-              className: session.class_name,
-              date: formatDate(session.date),
-              dayName: getDayName(session.day_of_week),
-              time: `${session.start_time} - ${session.end_time}`,
-              location: session.venue_name,
-              instructor: session.instructor_name,
-              status: session.attendance_status || getSessionStatus(session.date),
-              canRequestLeave: !isPastSession(session.date),
-              leaveRequest: session.leave_request
-            })));
+        ],
+        attendanceRecord: [
+          { date: '2024-12-18', className: 'Thursday Practice', status: 'present' },
+          { date: '2024-12-16', className: 'Monday Evening', status: 'present' },
+          { date: '2024-12-12', className: 'Thursday Practice', status: 'late' },
+          { date: '2024-12-09', className: 'Monday Evening', status: 'absent' }
+        ],
+        beltProgress: {
+          current: 'Green Belt',
+          next: 'Green Belt with Blue Tip',
+          progress: 75
+        },
+        announcements: [
+          {
+            title: 'Holiday Schedule',
+            content: 'Classes suspended Dec 25-31. Resume Jan 2.',
+            date: '2024-12-15',
+            priority: 'high'
+          },
+          {
+            title: 'Belt Testing Registration',
+            content: 'January belt testing registration now open.',
+            date: '2024-12-10',
+            priority: 'medium'
           }
+        ]
+      };
 
-          // 设置提醒偏好
-          if (data.notificationPreferences) {
-            setReminderSettings(data.notificationPreferences);
-          }
-        }
-      }
-
-      // 加载比赛信息
-      const competitionsResponse = await authenticatedFetch(buildApiUrl('competitions/upcoming?days=60'));
-      if (competitionsResponse.ok) {
-        const competitionsData = await competitionsResponse.json();
-        if (competitionsData.success) {
-          setCompetitions(competitionsData.data.competitions || []);
-          setMyRegistrations(competitionsData.data.myRegistrations || []);
-        }
-      }
-
-      // 加载公告
-      const announcementsResponse = await authenticatedFetch(buildApiUrl('announcements?scope=student'));
-      if (announcementsResponse.ok) {
-        const announcementsData = await announcementsResponse.json();
-        if (announcementsData.success) {
-          setAnnouncements(announcementsData.data || []);
-        }
-      }
-
-      // 加载未支付账单
-      const invoicesResponse = await authenticatedFetch(buildApiUrl('invoices?status=unpaid'));
-      if (invoicesResponse.ok) {
-        const invoicesData = await invoicesResponse.json();
-        if (invoicesData.success) {
-          setOutstandingInvoices(invoicesData.data || []);
-        }
-      }
-
+      setData(mockData);
       setLoading(false);
+      
     } catch (err) {
-      console.error('Student home load error:', err);
-      error('Error', 'Failed to load dashboard data. Please check your connection.');
+      console.error('Student dashboard load error:', err);
+      error('Error', 'Failed to load dashboard data');
       setLoading(false);
     }
   };
 
-  // ========== 辅助函数 ==========
-  const formatDate = (dateStr: string): string => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      month: 'short', 
-      day: 'numeric' 
-    });
-  };
-
-  const getDayName = (dayOfWeek: number): string => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return days[dayOfWeek] || 'Unknown';
-  };
-
-  const getSessionStatus = (dateStr: string): 'upcoming' | 'today' | 'in_progress' => {
-    const sessionDate = new Date(dateStr);
-    const today = new Date();
-    
-    if (sessionDate.toDateString() === today.toDateString()) {
-      return 'today';
-    }
-    
-    return 'upcoming';
-  };
-
-  const isPastSession = (dateStr: string): boolean => {
-    const sessionDate = new Date(dateStr);
-    const now = new Date();
-    return sessionDate < now;
-  };
-
-  const buildApiUrl = (endpoint: string): string => {
-    return `http://localhost:8787/api/${endpoint}`;
-  };
-
-  // ========== 事件处理 ==========
   const handleLogout = async () => {
     try {
       const { logout } = await import('@/lib/auth-client');
       await logout();
-      success('Success', 'Logged out successfully');
+      success('Logged Out', 'You have been successfully logged out');
       router.push('/login');
     } catch (err) {
-      console.error('Logout error:', err);
       error('Error', 'Failed to logout');
     }
   };
 
-  const handleRequestLeave = async (sessionId: string) => {
-    try {
-      // TODO: 实现请假申请功能
-      success('Success', 'Leave request submitted. Your coach will be notified.');
-    } catch (err) {
-      error('Error', 'Failed to submit leave request');
+  // 辅助函数
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'present': return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'late': return <Clock className="w-4 h-4 text-yellow-600" />;
+      case 'absent': return <AlertCircle className="w-4 h-4 text-red-600" />;
+      default: return null;
     }
   };
 
-  const handleFindMakeup = () => {
-    router.push('/dashboard/student/makeup');
-  };
-
-  const handleAddToCalendar = (sessionId: string) => {
-    // TODO: 实现添加到日历功能
-    success('Success', 'Session added to calendar');
-  };
-
-  const handleViewSessionDetails = (sessionId: string) => {
-    router.push(`/dashboard/student/sessions/${sessionId}`);
-  };
-
-  const handleViewCompetition = (competitionId: string) => {
-    router.push(`/dashboard/student/competitions/${competitionId}`);
-  };
-
-  const handleRegisterCompetition = (competitionId: string) => {
-    router.push(`/dashboard/student/competitions/${competitionId}/register`);
-  };
-
-  const handleViewRegistration = (registrationId: string) => {
-    router.push(`/dashboard/student/registrations/${registrationId}`);
-  };
-
-  const handleReadAnnouncement = async (announcementId: string) => {
-    try {
-      // TODO: 实现标记已读功能
-      setAnnouncements(prev => 
-        prev.map(a => a.id === announcementId ? { ...a, isRead: true } : a)
-      );
-    } catch (err) {
-      error('Error', 'Failed to mark announcement as read');
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'present': return 'text-green-600 bg-green-50';
+      case 'late': return 'text-yellow-600 bg-yellow-50';
+      case 'absent': return 'text-red-600 bg-red-50';
+      default: return 'text-gray-600 bg-gray-50';
     }
   };
 
-  const handleOpenAnnouncement = (announcementId: string) => {
-    router.push(`/dashboard/student/announcements/${announcementId}`);
-  };
-
-  const handlePayInvoice = (invoiceId: string) => {
-    router.push(`/dashboard/student/payments/checkout?invoice_id=${invoiceId}`);
-  };
-
-  const handleViewInvoice = (invoiceId: string) => {
-    router.push(`/dashboard/student/invoices/${invoiceId}`);
-  };
-
-  const handleUpdateReminderSettings = async (settings: ReminderSettings) => {
-    try {
-      // TODO: 实现保存提醒设置功能
-      setReminderSettings(settings);
-      success('Success', 'Reminder settings updated');
-    } catch (err) {
-      error('Error', 'Failed to update reminder settings');
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'border-l-red-500 bg-red-50';
+      case 'medium': return 'border-l-yellow-500 bg-yellow-50';
+      case 'low': return 'border-l-blue-500 bg-blue-50';
+      default: return 'border-l-gray-500 bg-gray-50';
     }
   };
 
-  const handleViewClasses = () => {
-    router.push('/dashboard/student/classes');
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleContactCoach = () => {
-    router.push('/dashboard/student/messages/new');
-  };
+  if (!data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <p className="text-gray-600">Failed to load dashboard data</p>
+          <button 
+            onClick={loadStudentData}
+            className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <AnimatedPage>
-      <div className="min-h-screen bg-gray-50">
-        {/* 页面头部 */}
-        <PageHeader
-          title="Student Home"
-          subtitle="Your classes, reminders, and important updates"
-          breadcrumbs={[
-            { label: 'Dashboard', onClick: () => router.push('/dashboard/student') }
-          ]}
-          actions={
-            <div className="flex items-center space-x-3">
-              <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                <Bell className="w-5 h-5" />
-              </button>
-              <button 
+    <AnimatedPage showBeltProgress={true} beltColor="green">
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full overflow-hidden shadow-md border-2 border-white">
+                  <img
+                    src="/img/logo.jpg"
+                    alt="Akira X Taekwondo"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Student Dashboard</h1>
+                  <p className="text-gray-600">Welcome back, {data.profile.name}</p>
+                </div>
+              </div>
+              <button
                 onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 transition-colors"
               >
-                <LogOut className="w-4 h-4 mr-2" />
+                <LogOut className="w-5 h-5" />
                 Logout
               </button>
             </div>
-          }
-        />
-
-        <div className="px-6 py-6 space-y-8">
-          {/* Row 1: Next Session + Reminders */}
-          <ScrollReveal>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <NextSessionCard
-                  session={nextSession}
-                  loading={loading}
-                  onRequestLeave={handleRequestLeave}
-                  onFindMakeup={handleFindMakeup}
-                  onAddToCalendar={handleAddToCalendar}
-                />
-              </div>
-              <div>
-                <RemindersCard
-                  settings={reminderSettings}
-                  loading={loading}
-                  onUpdateSettings={handleUpdateReminderSettings}
-                />
-              </div>
-            </div>
-          </ScrollReveal>
-
-          {/* Row 2: This Week */}
-          <ScrollReveal>
-            <ThisWeekList
-              sessions={weekSessions}
-              loading={loading}
-              onRequestLeave={handleRequestLeave}
-              onViewDetails={handleViewSessionDetails}
-            />
-          </ScrollReveal>
-
-          {/* Row 3: Competitions + Announcements */}
-          <ScrollReveal>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <CompetitionsSection
-                competitions={competitions}
-                myRegistrations={myRegistrations}
-                loading={loading}
-                onViewCompetition={handleViewCompetition}
-                onRegister={handleRegisterCompetition}
-                onViewRegistration={handleViewRegistration}
-              />
-              <AnnouncementsSection
-                announcements={announcements}
-                loading={loading}
-                onReadAnnouncement={handleReadAnnouncement}
-                onOpenAnnouncement={handleOpenAnnouncement}
-              />
-            </div>
-          </ScrollReveal>
-
-          {/* Row 4: Billing + Quick Actions */}
-          <ScrollReveal>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <BillingSection
-                  outstandingInvoices={outstandingInvoices}
-                  loading={loading}
-                  onPayInvoice={handlePayInvoice}
-                  onViewInvoice={handleViewInvoice}
-                />
-              </div>
-              <div>
-                <QuickActions
-                  onRequestLeave={() => handleRequestLeave('')}
-                  onFindMakeup={handleFindMakeup}
-                  onViewClasses={handleViewClasses}
-                  onContactCoach={handleContactCoach}
-                />
-              </div>
-            </div>
-          </ScrollReveal>
+          </div>
         </div>
-      </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Profile Summary */}
+              <ScrollReveal>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <div className="flex items-center gap-4 mb-6">
+                    <User className="w-8 h-8 text-primary-600" />
+                    <h2 className="text-xl font-bold text-gray-900">Your Profile</h2>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Student Code</label>
+                          <p className="text-gray-900">{data.profile.studentCode}</p>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Current Belt</label>
+                          <div className="flex items-center gap-3">
+                            <div 
+                              className="w-8 h-2 rounded-full"
+                              style={{ backgroundColor: data.profile.beltColor }}
+                            ></div>
+                            <span className="text-gray-900 font-medium">{data.profile.currentBelt}</span>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Joined Date</label>
+                          <p className="text-gray-900">{new Date(data.profile.joinedDate).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="bg-gradient-to-br from-primary-50 to-accent-50 rounded-lg p-4">
+                        <h3 className="font-semibold text-gray-900 mb-2">Belt Progress</h3>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Current: {data.beltProgress.current}</span>
+                            <span>Next: {data.beltProgress.next}</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-gradient-to-r from-primary-500 to-accent-500 h-2 rounded-full transition-all duration-500"
+                              style={{ width: `${data.beltProgress.progress}%` }}
+                            ></div>
+                          </div>
+                          <p className="text-xs text-gray-600">{data.beltProgress.progress}% to next belt</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              {/* Upcoming Classes */}
+              <ScrollReveal>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <div className="flex items-center gap-4 mb-6">
+                    <Calendar className="w-8 h-8 text-accent-600" />
+                    <h2 className="text-xl font-bold text-gray-900">Upcoming Classes</h2>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {data.upcomingClasses.map((classItem, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900 mb-1">{classItem.className}</h3>
+                            <div className="space-y-1 text-sm text-gray-600">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4" />
+                                <span>{new Date(classItem.date).toLocaleDateString()} at {classItem.time}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-4 h-4" />
+                                <span>{classItem.venue}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <User className="w-4 h-4" />
+                                <span>Instructor: {classItem.instructor}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                              Enrolled
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              {/* Recent Attendance */}
+              <ScrollReveal>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <div className="flex items-center gap-4 mb-6">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                    <h2 className="text-xl font-bold text-gray-900">Recent Attendance</h2>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {data.attendanceRecord.slice(0, 6).map((record, index) => (
+                      <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                        <div className="flex items-center gap-3">
+                          {getStatusIcon(record.status)}
+                          <div>
+                            <p className="font-medium text-gray-900">{record.className}</p>
+                            <p className="text-sm text-gray-500">{new Date(record.date).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(record.status)}`}>
+                          {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">This Month Attendance</span>
+                      <span className="font-semibold text-primary-600">87.5%</span>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+
+            {/* Right Column - Sidebar */}
+            <div className="space-y-8">
+              {/* Belt Progress Card */}
+              <ScrollReveal>
+                <div className="bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl p-6 text-white">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Award className="w-8 h-8" />
+                    <h3 className="text-lg font-bold">Belt Progress</h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm opacity-90">Current Belt</p>
+                      <p className="text-xl font-bold">{data.beltProgress.current}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm opacity-90">Next Target</p>
+                      <p className="font-semibold">{data.beltProgress.next}</p>
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Progress</span>
+                        <span>{data.beltProgress.progress}%</span>
+                      </div>
+                      <div className="w-full bg-white/20 rounded-full h-2">
+                        <div 
+                          className="bg-white h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${data.beltProgress.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              {/* Quick Stats */}
+              <ScrollReveal>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Stats</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="w-5 h-5 text-primary-600" />
+                        <span className="text-gray-700">Classes This Month</span>
+                      </div>
+                      <span className="font-semibold text-gray-900">14</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <TrendingUp className="w-5 h-5 text-green-600" />
+                        <span className="text-gray-700">Attendance Rate</span>
+                      </div>
+                      <span className="font-semibold text-green-600">87.5%</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-accent-600" />
+                        <span className="text-gray-700">Training Hours</span>
+                      </div>
+                      <span className="font-semibold text-gray-900">24h</span>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              {/* Announcements */}
+              <ScrollReveal>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <Bell className="w-6 h-6 text-accent-600" />
+                    <h3 className="text-lg font-bold text-gray-900">Announcements</h3>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {data.announcements.map((announcement, index) => (
+                      <div key={index} className={`border-l-4 p-3 rounded-r-lg ${getPriorityColor(announcement.priority)}`}>
+                        <h4 className="font-semibold text-gray-900 mb-1">{announcement.title}</h4>
+                        <p className="text-sm text-gray-700 mb-2">{announcement.content}</p>
+                        <p className="text-xs text-gray-500">{new Date(announcement.date).toLocaleDateString()}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              {/* Contact Information */}
+              <ScrollReveal>
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Need Help?</h3>
+                  
+                  <div className="space-y-3">
+                    <a 
+                      href="tel:+6587668794"
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                        <span className="text-primary-600 text-sm">📞</span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">Call Us</p>
+                        <p className="text-sm text-gray-600">+65 8766 8794</p>
+                      </div>
+                    </a>
+                    
+                    <a 
+                      href="https://wa.me/6587668794"
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <span className="text-green-600 text-sm">💬</span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">WhatsApp</p>
+                        <p className="text-sm text-gray-600">Quick message</p>
+                      </div>
+                    </a>
+                    
+                    <a 
+                      href="mailto:teamakiraxtaekwondo@gmail.com"
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-blue-600 text-sm">✉️</span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">Email</p>
+                        <p className="text-sm text-gray-600">Send message</p>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+          </div>
+        </div>
+      </main>
     </AnimatedPage>
   );
 }
 
 export default function StudentDashboard() {
   return (
-    <RouteProtection allowedRoles={['student']} requireAuth={true}>
+    <RouteProtection allowedRoles={['student', 'coach', 'admin']}>
       <StudentDashboardContent />
     </RouteProtection>
   );
