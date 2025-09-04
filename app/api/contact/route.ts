@@ -3,6 +3,8 @@
  * 联系表单提交处理
  */
 
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { ValidationError, Validator } from '@/lib/models';
 

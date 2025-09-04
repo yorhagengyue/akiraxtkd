@@ -4,6 +4,8 @@
  * POST /api/classes/[id]/students - 添加学员到课程
  */
 
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 import { ValidationError } from '@/lib/models';

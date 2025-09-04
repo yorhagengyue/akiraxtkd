@@ -5,6 +5,8 @@
  * DELETE /api/students/[id] - 删除学员
  */
 
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 import { DatabaseQuery } from '@/lib/database';

@@ -4,6 +4,8 @@
  * POST /api/classes/[id]/attendance/[date] - 记录特定日期的出勤
  */
 
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 import { ValidationError } from '@/lib/models';

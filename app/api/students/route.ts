@@ -3,6 +3,8 @@
  * 使用真实的数据库服务和验证
  */
 
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 import { DatabaseQuery, DatabaseError } from '@/lib/database';

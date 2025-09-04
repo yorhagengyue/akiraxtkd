@@ -3,6 +3,8 @@
  * POST /api/students/[id]/promote - 学员腰带升级
  */
 
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 import { DatabaseQuery } from '@/lib/database';

@@ -4,6 +4,8 @@
  * POST /api/attendance - 批量记录出勤
  */
 
+export const runtime = 'edge';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
 import { ValidationError } from '@/lib/models';
