@@ -141,10 +141,10 @@ export default function TeamSection() {
                         <User className="w-4 h-4" />
                         <span className="text-sm">Professional Instructor</span>
                       </div>
-                      <button className="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg">
+                      <a href="/about#team" className="flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg">
                         <Heart className="w-4 h-4" />
                         Learn More
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -164,12 +164,12 @@ export default function TeamSection() {
               Whether you're a beginner or advanced practitioner, our team is here to support your journey.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-8 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg">
+              <a href="https://wa.me/6587668794?text=Hi%2C%20I%20would%20like%20to%20schedule%20a%20trial%20class" target="_blank" rel="noopener noreferrer" className="inline-block bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-8 py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg text-center">
                 Schedule a Trial Class
-              </button>
-              <button className="border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-all">
+              </a>
+              <a href="mailto:teamakiraxtaekwondo@gmail.com?subject=Training%20Enquiry" className="inline-block border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-all text-center">
                 Contact Our Team
-              </button>
+              </a>
             </div>
           </div>
         </div>

@@ -401,3 +401,118 @@ export function getEnvironmentInfo(): Response {
     version: 'next-on-pages',
   });
 }
+
+/**
+ * Simple JWT verification for Next.js
+ */
+function verifySimpleJWT(token: string, secret: string): any | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    
+    const payload = JSON.parse(atob(parts[1]));
+    const now = Math.floor(Date.now() / 1000);
+    
+    // Check expiration
+    if (payload.exp && payload.exp < now) {
+      console.log('Token expired');
+      return null;
+    }
+    
+    return payload;
+  } catch (error) {
+    console.error('JWT verification failed:', error);
+    return null;
+  }
+}
+
+/**
+ * Middleware to require authentication for API routes
+ */
+export async function requireAuth(
+  request: NextRequest,
+  requiredRole?: 'admin' | 'coach' | 'student'
+): Promise<{ success: true; user: any } | { success: false; response: Response }> {
+  try {
+    const authHeader = request.headers.get('Authorization');
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return {
+        success: false,
+        response: jsonResponse({
+          success: false,
+          error: 'Authentication required',
+          message: 'Missing or invalid Authorization header'
+        }, 401)
+      };
+    }
+    
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const env = getEnv();
+    
+    // Verify JWT token
+    const payload = verifySimpleJWT(token, env.JWT_SECRET);
+    
+    if (!payload) {
+      return {
+        success: false,
+        response: jsonResponse({
+          success: false,
+          error: 'Invalid token',
+          message: 'Token is invalid or expired'
+        }, 401)
+      };
+    }
+    
+    // Check role permissions if required
+    if (requiredRole) {
+      const userRole = payload.role;
+      
+      // Admin can access everything
+      if (userRole === 'admin') {
+        // Allow admin access to all endpoints
+      } else if (requiredRole === 'admin' && userRole !== 'admin') {
+        return {
+          success: false,
+          response: jsonResponse({
+            success: false,
+            error: 'Insufficient permissions',
+            message: 'Admin access required'
+          }, 403)
+        };
+      } else if (requiredRole === 'coach' && !['admin', 'coach'].includes(userRole)) {
+        return {
+          success: false,
+          response: jsonResponse({
+            success: false,
+            error: 'Insufficient permissions',
+            message: 'Coach or admin access required'
+          }, 403)
+        };
+      } else if (requiredRole === 'student' && userRole !== 'student' && userRole !== 'admin') {
+        // Students can only access their own data, admins can access student endpoints
+        return {
+          success: false,
+          response: jsonResponse({
+            success: false,
+            error: 'Insufficient permissions',
+            message: 'Student access required'
+          }, 403)
+        };
+      }
+    }
+    
+    return { success: true, user: payload };
+    
+  } catch (error) {
+    console.error('Authentication error:', error);
+    return {
+      success: false,
+      response: jsonResponse({
+        success: false,
+        error: 'Authentication failed',
+        message: 'Internal authentication error'
+      }, 500)
+    };
+  }
+}

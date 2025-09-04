@@ -1,6 +1,66 @@
+'use client';
+
+import { useState } from 'react';
 import { MessageSquare, Mail, Instagram, Facebook, MapPin, Clock, Phone } from 'lucide-react'
+import { useToast } from '@/components/ui/Toast';
+import { LoadingButton } from '@/components/ui/Loading';
 
 export default function ContactSection() {
+  const { success, error } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    class: '',
+    message: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.message) {
+      error('Validation Error', 'Please fill in all required fields');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        success('Message Sent!', 'Thank you for your message. We will get back to you within 24 hours.');
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          class: '',
+          message: ''
+        });
+      } else {
+        throw new Error(data.message || 'Failed to send message');
+      }
+    } catch (err) {
+      console.error('Contact form error:', err);
+      error('Send Failed', err instanceof Error ? err.message : 'Failed to send message. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <section id="contact" className="py-16 bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,7 +148,7 @@ export default function ContactSection() {
           {/* Contact Form */}
           <div className="bg-gray-800 p-8 rounded-lg">
             <h3 className="text-2xl font-bold mb-6">Send us a message</h3>
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
                   Name (Required)
@@ -97,6 +157,8 @@ export default function ContactSection() {
                   type="text"
                   id="name"
                   name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
                   required
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white"
                   placeholder="Your full name"
@@ -111,9 +173,11 @@ export default function ContactSection() {
                   type="email"
                   id="email"
                   name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   required
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white"
-                  placeholder="teamakiraxtaekwondo@gmail.com"
+                  placeholder="your.email@example.com"
                 />
               </div>
 
@@ -125,8 +189,10 @@ export default function ContactSection() {
                   type="tel"
                   id="phone"
                   name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white"
-                  placeholder="+65 8766 8794"
+                  placeholder="+65 8123 4567"
                 />
               </div>
 
@@ -137,6 +203,8 @@ export default function ContactSection() {
                 <select
                   id="class"
                   name="class"
+                  value={formData.class}
+                  onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white"
                 >
                   <option value="">Select a class</option>
@@ -155,18 +223,21 @@ export default function ContactSection() {
                 <textarea
                   id="message"
                   name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
                   rows={4}
+                  required
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white"
                   placeholder="Tell us about your goals and any questions you have..."
                 ></textarea>
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
+              <LoadingButton
+                loading={submitting}
+                className="w-full bg-primary-600 hover:bg-primary-700 focus:ring-primary-500"
               >
                 Send Message
-              </button>
+              </LoadingButton>
             </form>
           </div>
         </div>

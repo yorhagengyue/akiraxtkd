@@ -115,9 +115,9 @@ export default function WhySection() {
           <p className="text-lg text-gray-700 leading-relaxed max-w-4xl mx-auto mb-8">
             Whether you're searching for <strong className="text-primary-600">martial arts classes</strong> or want to join a <strong className="text-primary-600">professional training academy</strong>, we are the name to trust. Experience the difference of learning at our <strong className="text-accent-600">premier martial arts school</strong>, where passion meets precision, and excellence defines every training session.
           </p>
-          <button className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-8 py-3 rounded-lg font-semibold transition-all shadow-lg hover:scale-105 hover:shadow-xl">
+          <a href="/classes" className="inline-block bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-8 py-3 rounded-lg font-semibold transition-all shadow-lg hover:scale-105 hover:shadow-xl">
             Discover Our Programs
-          </button>
+          </a>
         </div>
       </div>
     </section>

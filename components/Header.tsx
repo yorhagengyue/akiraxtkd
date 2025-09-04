@@ -142,14 +142,27 @@ export default function Header() {
 
           {/* Search Bar - Desktop */}
           <div className="hidden md:flex items-center max-w-md mx-4 flex-1">
-            <div className="relative w-full">
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const searchQuery = formData.get('search') as string;
+                if (searchQuery.trim()) {
+                  router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+                }
+              }}
+              className="relative w-full"
+            >
               <input
                 type="text"
-                placeholder="Search for:"
+                name="search"
+                placeholder="Search classes, patterns..."
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
               />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            </div>
+              <button type="submit" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors">
+                <Search className="w-4 h-4" />
+              </button>
+            </form>
           </div>
 
           {/* Desktop Navigation */}
@@ -254,14 +267,28 @@ export default function Header() {
           <div className="md:hidden animate-fade-in">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gradient-to-br from-gray-50 to-primary-50 rounded-b-2xl border-t border-gray-100">
               {/* Mobile Search */}
-              <div className="relative mb-4">
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const searchQuery = formData.get('mobile-search') as string;
+                  if (searchQuery.trim()) {
+                    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+                    setIsMenuOpen(false);
+                  }
+                }}
+                className="relative mb-4"
+              >
                 <input
                   type="text"
-                  placeholder="Search for:"
+                  name="mobile-search"
+                  placeholder="Search classes, patterns..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white/80 backdrop-blur-sm transition-all duration-300"
                 />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              </div>
+                <button type="submit" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors">
+                  <Search className="w-4 h-4" />
+                </button>
+              </form>
               
               {navItems.map((item, index) => (
                 <div key={item.name}>

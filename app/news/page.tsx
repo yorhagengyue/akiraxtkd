@@ -88,7 +88,7 @@ export default function NewsPage() {
   const regularNews = newsItems.filter(item => !item.featured);
 
   return (
-    <AnimatedPage showBeltProgress={true} beltColor="accent">
+    <AnimatedPage showBeltProgress={true} beltColor="yellow">
       <Header />
       
       <main className="min-h-screen">

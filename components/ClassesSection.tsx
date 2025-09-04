@@ -107,9 +107,9 @@ export default function ClassesSection() {
                   ))}
                 </ul>
                 
-                <button className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-3 px-4 rounded-xl font-semibold transition-all shadow-md hover:scale-105 hover:shadow-lg">
+                <a href="/classes" className="block w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-3 px-4 rounded-xl font-semibold transition-all shadow-md hover:scale-105 hover:shadow-lg text-center">
                   Learn More
-                </button>
+                </a>
               </div>
             </div>
           ))}
@@ -120,9 +120,9 @@ export default function ClassesSection() {
             Experience the difference of learning at our professional martial arts academy, where passion meets precision, 
             and excellence defines every training session.
           </p>
-          <button className="bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white px-10 py-4 rounded-xl font-semibold transition-all shadow-lg text-lg hover:scale-105 hover:shadow-xl">
+          <a href="/classes" className="inline-block bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white px-10 py-4 rounded-xl font-semibold transition-all shadow-lg text-lg hover:scale-105 hover:shadow-xl">
             View All Classes
-          </button>
+          </a>
         </div>
       </div>
     </section>

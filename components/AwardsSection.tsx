@@ -76,12 +76,12 @@ export default function AwardsSection() {
         </div>
 
         <div className="text-center">
-          <button className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors mr-4">
+          <a href="/about#awards" className="inline-block bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors mr-4">
             MORE AWARDS
-          </button>
-          <button className="border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+          </a>
+          <a href="/about#certificates" className="inline-block border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-8 py-3 rounded-lg font-semibold transition-colors">
             View Certificates
-          </button>
+          </a>
         </div>
 
         <div className="mt-12 bg-white rounded-lg p-8 shadow-md">

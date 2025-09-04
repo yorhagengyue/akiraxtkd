@@ -36,10 +36,10 @@ export default function Footer() {
             <div>
               <h4 className="font-semibold mb-3">Programs</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Beginners</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Youth Classes</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Adult Programs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Competition Team</a></li>
+                <li><a href="/classes?audience=beginner" className="hover:text-white transition-colors">Beginners</a></li>
+                <li><a href="/classes?audience=youth" className="hover:text-white transition-colors">Youth Classes</a></li>
+                <li><a href="/classes?audience=adult" className="hover:text-white transition-colors">Adult Programs</a></li>
+                <li><a href="/classes?audience=competition" className="hover:text-white transition-colors">Competition Team</a></li>
               </ul>
             </div>
             

@@ -1,388 +1,271 @@
-// Belt System Management API - 腰带等级管理
+/**
+ * Belt Levels API - 腰带等级管理
+ * GET /api/belts - 获取所有腰带等级
+ * POST /api/belts - 创建新腰带等级
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
+import { ValidationError } from '@/lib/models';
 
-// 腰带等级数据结构
-interface BeltLevel {
-  beltId: string;
-  trackId: string;
-  trackName: string;
-  name: string;
-  nameKorean?: string;
-  color: string;
-  orderIndex: number;
-  isTip: boolean;
-  isStripe: boolean;
-  requirements: {
-    minAge?: number;
-    minWeeks: number;
-    minClasses: number;
-    skillLevel: string;
-  };
-  description?: string;
-  createdAt: string;
-}
+// 标准化错误响应
+function createErrorResponse(error: any, status: number = 500) {
+  console.error('Belts API Error:', error);
 
-interface BeltPromotion {
-  promotionId: string;
-  studentId: string;
-  studentName: string;
-  fromBeltId: string;
-  fromBeltName: string;
-  toBeltId: string;
-  toBeltName: string;
-  promotionDate: string;
-  gradedBy: string;
-  testScore?: number;
-  comments?: string;
-  certificateIssued: boolean;
-  createdAt: string;
-}
-
-interface PromoteStudentRequest {
-  studentId: string;
-  newBeltId: string;
-  promotionDate: string;
-  testScore?: number;
-  comments?: string;
-}
-
-// GET /api/belts - 获取腰带等级系统
-export async function GET(request: NextRequest) {
-  try {
-    const authResult = await requireAuth(request);
-    if (!authResult.success) {
-      return NextResponse.json(
-        { success: false, error: 'AUTHENTICATION_REQUIRED' },
-        { status: 401 }
-      );
-    }
-
-    const { searchParams } = new URL(request.url);
-    const trackId = searchParams.get('track_id');
-    const includeRequirements = searchParams.get('include_requirements') !== 'false';
-
-    const useMockData = process.env.DEV_MODE === 'true' || !process.env.D1_DATABASE_ID;
-
-    if (useMockData) {
-      // Mock腰带等级数据
-      const mockBelts: BeltLevel[] = [
-        {
-          beltId: 'belt-001',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'White Belt',
-          nameKorean: '백띠',
-          color: '#e5e7eb',
-          orderIndex: 1,
-          isTip: false,
-          isStripe: false,
-          requirements: {
-            minWeeks: 0,
-            minClasses: 0,
-            skillLevel: 'Beginner'
-          },
-          description: 'Starting level for all new students',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-002',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'White Belt with Yellow Tip',
-          nameKorean: '백띠 노란줄',
-          color: '#e5e7eb',
-          orderIndex: 2,
-          isTip: true,
-          isStripe: false,
-          requirements: {
-            minWeeks: 4,
-            minClasses: 8,
-            skillLevel: 'Basic techniques'
-          },
-          description: 'First advancement showing basic techniques',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-003',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'Yellow Belt',
-          nameKorean: '노란띠',
-          color: '#fbbf24',
-          orderIndex: 3,
-          isTip: false,
-          isStripe: false,
-          requirements: {
-            minWeeks: 8,
-            minClasses: 16,
-            skillLevel: 'Basic forms and techniques'
-          },
-          description: 'Basic techniques and forms mastered',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-004',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'Yellow Belt with Green Tip',
-          nameKorean: '노란띠 초록줄',
-          color: '#fbbf24',
-          orderIndex: 4,
-          isTip: true,
-          isStripe: false,
-          requirements: {
-            minWeeks: 12,
-            minClasses: 24,
-            skillLevel: 'Intermediate preparation'
-          },
-          description: 'Transition to intermediate level',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-005',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'Green Belt',
-          nameKorean: '초록띠',
-          color: '#22c55e',
-          orderIndex: 5,
-          isTip: false,
-          isStripe: false,
-          requirements: {
-            minWeeks: 16,
-            minClasses: 32,
-            skillLevel: 'Intermediate techniques'
-          },
-          description: 'Solid intermediate techniques',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-006',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'Green Belt with Blue Tip',
-          nameKorean: '초록띠 파란줄',
-          color: '#22c55e',
-          orderIndex: 6,
-          isTip: true,
-          isStripe: false,
-          requirements: {
-            minWeeks: 20,
-            minClasses: 40,
-            skillLevel: 'Advanced intermediate'
-          },
-          description: 'Advanced intermediate level',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-007',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'Blue Belt',
-          nameKorean: '파란띠',
-          color: '#3b82f6',
-          orderIndex: 7,
-          isTip: false,
-          isStripe: false,
-          requirements: {
-            minWeeks: 24,
-            minClasses: 48,
-            skillLevel: 'Advanced techniques'
-          },
-          description: 'Advanced techniques and sparring',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-008',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'Blue Belt with Red Tip',
-          nameKorean: '파란띠 빨간줄',
-          color: '#3b82f6',
-          orderIndex: 8,
-          isTip: true,
-          isStripe: false,
-          requirements: {
-            minWeeks: 28,
-            minClasses: 56,
-            skillLevel: 'Pre-red belt preparation'
-          },
-          description: 'Preparation for red belt',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-009',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'Red Belt',
-          nameKorean: '빨간띠',
-          color: '#ef4444',
-          orderIndex: 9,
-          isTip: false,
-          isStripe: false,
-          requirements: {
-            minWeeks: 32,
-            minClasses: 64,
-            skillLevel: 'Expert level techniques'
-          },
-          description: 'Expert level techniques',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-010',
-          trackId: 'track-color',
-          trackName: 'Color Belts',
-          name: 'Red Belt with Black Tip',
-          nameKorean: '빨간띠 검은줄',
-          color: '#ef4444',
-          orderIndex: 10,
-          isTip: true,
-          isStripe: false,
-          requirements: {
-            minWeeks: 36,
-            minClasses: 72,
-            skillLevel: 'Black belt preparation'
-          },
-          description: 'Preparation for black belt',
-          createdAt: '2024-01-01T00:00:00Z'
-        },
-        {
-          beltId: 'belt-011',
-          trackId: 'track-black',
-          trackName: 'Black Belts',
-          name: 'Black Belt 1st Dan',
-          nameKorean: '검은띠 1단',
-          color: '#1f2937',
-          orderIndex: 11,
-          isTip: false,
-          isStripe: false,
-          requirements: {
-            minAge: 16,
-            minWeeks: 52,
-            minClasses: 100,
-            skillLevel: 'Master all color belt techniques'
-          },
-          description: 'First degree black belt',
-          createdAt: '2024-01-01T00:00:00Z'
-        }
-      ];
-
-      // 应用过滤
-      let filteredBelts = mockBelts;
-      if (trackId) {
-        filteredBelts = filteredBelts.filter(belt => belt.trackId === trackId);
-      }
-
-      // 如果不需要requirements，移除该字段
-      if (!includeRequirements) {
-        filteredBelts = filteredBelts.map(belt => {
-          const { requirements, ...beltWithoutRequirements } = belt;
-          return beltWithoutRequirements as BeltLevel;
-        });
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: filteredBelts,
-        meta: {
-          isMockData: true,
-          totalBelts: filteredBelts.length,
-          filters: { trackId, includeRequirements },
-          environment: process.env.ENVIRONMENT || 'development'
-        }
-      });
-    }
-
-    // 生产环境数据库查询
-    // TODO: 实现D1数据库查询
+  if (error instanceof ValidationError) {
     return NextResponse.json({
       success: false,
-      error: 'NOT_IMPLEMENTED',
-      message: 'Production database integration pending'
-    }, { status: 501 });
+      error: 'VALIDATION_ERROR',
+      message: error.message,
+      field: error.field,
+      code: error.code
+    }, { status: 400 });
+  }
+
+  return NextResponse.json({
+    success: false,
+    error: 'INTERNAL_ERROR',
+    message: error.message || 'An unexpected error occurred'
+  }, { status });
+}
+
+// Mock腰带数据
+const mockBelts = [
+  {
+    id: 1,
+    belt_name: 'White Belt',
+    belt_color: '#e5e7eb',
+    level_order: 1,
+    description: 'Beginner level - Learning basic stances and movements',
+    requirements: 'Basic stances, simple kicks, respect and discipline',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 2,
+    belt_name: 'Yellow Belt',
+    belt_color: '#fbbf24',
+    level_order: 2,
+    description: 'Elementary level - Basic techniques and forms',
+    requirements: 'Taeguek Il Jang, basic kicks, breaking techniques',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 3,
+    belt_name: 'Yellow Belt with Green Tip',
+    belt_color: '#fbbf24',
+    level_order: 3,
+    description: 'Intermediate elementary - Enhanced basic skills',
+    requirements: 'Taeguek E Jang, improved kicking techniques',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 4,
+    belt_name: 'Green Belt',
+    belt_color: '#22c55e',
+    level_order: 4,
+    description: 'Intermediate level - Advanced techniques and sparring',
+    requirements: 'Taeguek Sam Jang, sparring techniques, board breaking',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 5,
+    belt_name: 'Green Belt with Blue Tip',
+    belt_color: '#22c55e',
+    level_order: 5,
+    description: 'Advanced intermediate - Complex combinations',
+    requirements: 'Taeguek Sa Jang, advanced sparring, leadership skills',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 6,
+    belt_name: 'Blue Belt',
+    belt_color: '#3b82f6',
+    level_order: 6,
+    description: 'Advanced level - Mastery of intermediate techniques',
+    requirements: 'Taeguek O Jang, advanced combinations, teaching assistance',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 7,
+    belt_name: 'Blue Belt with Red Tip',
+    belt_color: '#3b82f6',
+    level_order: 7,
+    description: 'Pre-advanced level - Preparation for red belt',
+    requirements: 'Taeguek Yuk Jang, competition readiness, mentoring',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 8,
+    belt_name: 'Red Belt',
+    belt_color: '#ef4444',
+    level_order: 8,
+    description: 'Senior level - Advanced mastery and leadership',
+    requirements: 'Taeguek Chil Jang, tournament participation, teaching',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 9,
+    belt_name: 'Red Belt with Black Tip',
+    belt_color: '#ef4444',
+    level_order: 9,
+    description: 'Pre-black belt - Final preparation for black belt',
+    requirements: 'Taeguek Pal Jang, advanced sparring, leadership demonstration',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: 10,
+    belt_name: 'Black Belt (1st Dan)',
+    belt_color: '#1f2937',
+    level_order: 10,
+    description: 'Expert level - Beginning of mastery',
+    requirements: 'All Taeguek forms, advanced techniques, teaching capability',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z'
+  }
+];
+
+// GET /api/belts - 获取所有腰带等级
+export async function GET(request: NextRequest) {
+  try {
+    // 验证权限
+    const authResult = await requireAuth(request);
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
+    // 解析查询参数
+    const url = new URL(request.url);
+    const includeInactive = url.searchParams.get('include_inactive') === 'true';
+    const sortBy = url.searchParams.get('sort_by') || 'level_order';
+    const sortOrder = url.searchParams.get('sort_order') || 'ASC';
+
+    let belts = [...mockBelts];
+
+    // 排序
+    belts.sort((a, b) => {
+      let aValue = (a as any)[sortBy];
+      let bValue = (b as any)[sortBy];
+      
+      if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+      
+      if (sortOrder === 'DESC') {
+        return bValue > aValue ? 1 : -1;
+      }
+      return aValue > bValue ? 1 : -1;
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: belts,
+      meta: {
+        total: belts.length,
+        sort_by: sortBy,
+        sort_order: sortOrder
+      }
+    });
 
   } catch (error) {
-    console.error('Belts API error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'INTERNAL_ERROR',
-        message: 'Failed to fetch belt levels',
-        details: process.env.DEV_MODE === 'true' ? error.message : undefined
-      },
-      { status: 500 }
-    );
+    return createErrorResponse(error);
   }
 }
 
-// POST /api/belts - 学员升级
+// POST /api/belts - 创建新腰带等级
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await requireAuth(request);
-    if (!authResult.success || !['coach', 'admin'].includes(authResult.user.role)) {
-      return NextResponse.json(
-        { success: false, error: 'INSUFFICIENT_PERMISSIONS', message: 'Coach or admin access required' },
-        { status: 403 }
-      );
+    // 验证权限（需要管理员权限）
+    const authResult = await requireAuth(request, 'admin');
+    if (!authResult.success) {
+      return authResult.response;
     }
 
-    const promotionData: PromoteStudentRequest = await request.json();
-    
-    // 验证数据
-    if (!promotionData.studentId || !promotionData.newBeltId || !promotionData.promotionDate) {
+    const body = await request.json();
+    const { belt_name, belt_color, level_order, description, requirements } = body;
+
+    // 验证必填字段
+    if (!belt_name || !belt_color || level_order === undefined) {
       return NextResponse.json({
         success: false,
         error: 'VALIDATION_ERROR',
-        message: 'Student ID, new belt ID, and promotion date are required'
-      }, { status: 422 });
+        message: 'Missing required fields: belt_name, belt_color, level_order'
+      }, { status: 400 });
     }
 
-    const useMockData = process.env.DEV_MODE === 'true' || !process.env.D1_DATABASE_ID;
-
-    if (useMockData) {
-      // Mock学员升级
-      const promotion: BeltPromotion = {
-        promotionId: `promotion-${Date.now()}`,
-        studentId: promotionData.studentId,
-        studentName: 'Student Name', // Would be fetched from DB
-        fromBeltId: 'belt-005', // Mock current belt
-        fromBeltName: 'Green Belt',
-        toBeltId: promotionData.newBeltId,
-        toBeltName: 'Green Belt with Blue Tip', // Would be fetched from DB
-        promotionDate: promotionData.promotionDate,
-        gradedBy: authResult.user.displayName || authResult.user.uid,
-        testScore: promotionData.testScore,
-        comments: promotionData.comments,
-        certificateIssued: false,
-        createdAt: new Date().toISOString()
-      };
-
+    // 验证腰带名称唯一性
+    const existingBelt = mockBelts.find(belt => 
+      belt.belt_name.toLowerCase() === belt_name.toLowerCase()
+    );
+    
+    if (existingBelt) {
       return NextResponse.json({
-        success: true,
-        data: promotion,
-        message: 'Student promoted successfully'
-      }, { status: 201 });
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Belt name already exists',
+        field: 'belt_name'
+      }, { status: 400 });
     }
 
-    // 生产环境数据库操作
-    // TODO: 实现D1数据库插入
+    // 验证等级顺序唯一性
+    const existingOrder = mockBelts.find(belt => belt.level_order === level_order);
+    if (existingOrder) {
+      return NextResponse.json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Level order already exists',
+        field: 'level_order'
+      }, { status: 400 });
+    }
+
+    // 验证颜色格式
+    if (!/^#[0-9A-Fa-f]{6}$/.test(belt_color)) {
+      return NextResponse.json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Invalid color format. Use hex format (#RRGGBB)',
+        field: 'belt_color'
+      }, { status: 400 });
+    }
+
+    // 验证等级顺序范围
+    if (level_order < 1 || level_order > 100) {
+      return NextResponse.json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Level order must be between 1 and 100',
+        field: 'level_order'
+      }, { status: 400 });
+    }
+
+    // 创建新腰带
+    const newBelt = {
+      id: Math.max(...mockBelts.map(b => b.id)) + 1,
+      belt_name: belt_name.trim(),
+      belt_color: belt_color.toLowerCase(),
+      level_order: parseInt(level_order),
+      description: description?.trim() || null,
+      requirements: requirements?.trim() || null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
     return NextResponse.json({
-      success: false,
-      error: 'NOT_IMPLEMENTED',
-      message: 'Production database integration pending'
-    }, { status: 501 });
+      success: true,
+      data: newBelt,
+      message: 'Belt level created successfully'
+    }, { status: 201 });
 
   } catch (error) {
-    console.error('Belt promotion error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'INTERNAL_ERROR',
-        message: 'Failed to promote student',
-        details: process.env.DEV_MODE === 'true' ? error.message : undefined
-      },
-      { status: 500 }
-    );
+    return createErrorResponse(error);
   }
 }

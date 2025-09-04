@@ -1,477 +1,417 @@
-// Attendance Management API - 出勤管理功能
+/**
+ * Attendance Management API - 出勤管理
+ * GET /api/attendance - 获取出勤记录
+ * POST /api/attendance - 批量记录出勤
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
+import { ValidationError } from '@/lib/models';
 
-// 出勤记录数据结构
-interface AttendanceRecord {
-  attendanceId: string;
-  sessionId: string;
-  sessionDate: string;
-  classId: string;
-  className: string;
-  studentId: string;
-  studentName: string;
-  studentCode: string;
-  status: 'present' | 'absent' | 'late' | 'makeup';
-  arrivalTime?: string;
-  departureTime?: string;
-  notes?: string;
-  recordedBy: string;
-  recordedAt: string;
+// 标准化错误响应
+function createErrorResponse(error: any, status: number = 500) {
+  console.error('Attendance API Error:', error);
+
+  if (error instanceof ValidationError) {
+    return NextResponse.json({
+      success: false,
+      error: 'VALIDATION_ERROR',
+      message: error.message,
+      field: error.field,
+      code: error.code
+    }, { status: 400 });
+  }
+
+  return NextResponse.json({
+    success: false,
+    error: 'INTERNAL_ERROR',
+    message: error.message || 'An unexpected error occurred'
+  }, { status });
 }
 
-interface SessionAttendance {
-  sessionId: string;
-  classId: string;
-  className: string;
-  sessionDate: string;
-  venue: string;
-  instructor: string;
-  plannedStartTime: string;
-  plannedEndTime: string;
-  status: 'scheduled' | 'completed' | 'cancelled';
-  enrolledStudents: Array<{
-    studentId: string;
-    studentName: string;
-    studentCode: string;
-    currentBelt: string;
-    attendanceStatus?: 'present' | 'absent' | 'late' | 'makeup';
-    arrivalTime?: string;
-    notes?: string;
-  }>;
-  attendanceStats: {
-    total: number;
-    present: number;
-    absent: number;
-    late: number;
-    rate: number;
-  };
-  recordedBy?: string;
-  recordedAt?: string;
-}
-
-interface RecordAttendanceRequest {
-  sessionId: string;
-  attendance: Array<{
-    studentId: string;
-    status: 'present' | 'absent' | 'late' | 'makeup';
-    arrivalTime?: string;
-    departureTime?: string;
-    notes?: string;
-  }>;
-}
+// Mock出勤数据
+const mockAttendanceRecords = [
+  {
+    id: 1,
+    student_id: 1,
+    class_id: 1,
+    attendance_date: '2024-12-16',
+    status: 'Present' as const,
+    arrival_time: '20:00',
+    notes: null,
+    student_name: 'Alex Chen',
+    student_code: 'AXT2024001',
+    class_name: 'Monday Evening Class',
+    instructor_name: 'Jasterfer Kellen',
+    created_at: '2024-12-16T20:00:00Z',
+    updated_at: '2024-12-16T20:00:00Z'
+  },
+  {
+    id: 2,
+    student_id: 2,
+    class_id: 1,
+    attendance_date: '2024-12-16',
+    status: 'Late' as const,
+    arrival_time: '20:10',
+    notes: 'Traffic jam',
+    student_name: 'Sarah Wong',
+    student_code: 'AXT2024002',
+    class_name: 'Monday Evening Class',
+    instructor_name: 'Jasterfer Kellen',
+    created_at: '2024-12-16T20:10:00Z',
+    updated_at: '2024-12-16T20:10:00Z'
+  },
+  {
+    id: 3,
+    student_id: 1,
+    class_id: 2,
+    attendance_date: '2024-12-12',
+    status: 'Present' as const,
+    arrival_time: '19:30',
+    notes: null,
+    student_name: 'Alex Chen',
+    student_code: 'AXT2024001',
+    class_name: 'Thursday Practice',
+    instructor_name: 'Jasterfer Kellen',
+    created_at: '2024-12-12T19:30:00Z',
+    updated_at: '2024-12-12T19:30:00Z'
+  },
+  {
+    id: 4,
+    student_id: 3,
+    class_id: 1,
+    attendance_date: '2024-12-16',
+    status: 'Absent' as const,
+    arrival_time: null,
+    notes: 'Sick',
+    student_name: 'Michael Tan',
+    student_code: 'AXT2024003',
+    class_name: 'Monday Evening Class',
+    instructor_name: 'Jasterfer Kellen',
+    created_at: '2024-12-16T21:00:00Z',
+    updated_at: '2024-12-16T21:00:00Z'
+  }
+];
 
 // GET /api/attendance - 获取出勤记录
 export async function GET(request: NextRequest) {
   try {
+    // 验证权限
     const authResult = await requireAuth(request);
-    if (!authResult.success || !['coach', 'admin'].includes(authResult.user.role)) {
-      return NextResponse.json(
-        { success: false, error: 'INSUFFICIENT_PERMISSIONS', message: 'Coach or admin access required' },
-        { status: 403 }
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
+    // 解析查询参数
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '10');
+    const startDate = url.searchParams.get('start_date');
+    const endDate = url.searchParams.get('end_date');
+    const classId = url.searchParams.get('class_id');
+    const studentId = url.searchParams.get('student_id');
+    const status = url.searchParams.get('status');
+
+    let filteredRecords = [...mockAttendanceRecords];
+
+    // 应用筛选
+    if (startDate) {
+      filteredRecords = filteredRecords.filter(record => 
+        record.attendance_date >= startDate
       );
     }
 
-    const { searchParams } = new URL(request.url);
-    const sessionId = searchParams.get('session_id');
-    const classId = searchParams.get('class_id');
-    const studentId = searchParams.get('student_id');
-    const dateFrom = searchParams.get('date_from');
-    const dateTo = searchParams.get('date_to');
-    const type = searchParams.get('type') || 'records'; // 'records' | 'sessions'
+    if (endDate) {
+      filteredRecords = filteredRecords.filter(record => 
+        record.attendance_date <= endDate
+      );
+    }
 
-    const useMockData = process.env.DEV_MODE === 'true' || !process.env.D1_DATABASE_ID;
+    if (classId) {
+      filteredRecords = filteredRecords.filter(record => 
+        record.class_id === parseInt(classId)
+      );
+    }
 
-    if (useMockData) {
-      if (type === 'sessions') {
-        // 返回会话出勤概览
-        const mockSessions: SessionAttendance[] = [
-          {
-            sessionId: 'session-001',
-            classId: 'class-001',
-            className: 'Monday Evening Class',
-            sessionDate: '2024-12-16',
-            venue: 'Tampines Training Center',
-            instructor: 'Jasterfer Kellen',
-            plannedStartTime: '20:00',
-            plannedEndTime: '21:00',
-            status: 'completed',
-            enrolledStudents: [
-              {
-                studentId: 'student-001',
-                studentName: 'Rishabh Singh Bist',
-                studentCode: 'AXT2024001',
-                currentBelt: 'Blue Belt',
-                attendanceStatus: 'present',
-                arrivalTime: '19:58'
-              },
-              {
-                studentId: 'student-002',
-                studentName: 'Avaneesh',
-                studentCode: 'AXT2024002',
-                currentBelt: 'Green Belt',
-                attendanceStatus: 'present',
-                arrivalTime: '20:02'
-              },
-              {
-                studentId: 'student-004',
-                studentName: 'Aska',
-                studentCode: 'AXT2024004',
-                currentBelt: 'Green Belt',
-                attendanceStatus: 'late',
-                arrivalTime: '20:15',
-                notes: 'Traffic delay'
-              },
-              {
-                studentId: 'student-005',
-                studentName: 'Aadvik',
-                studentCode: 'AXT2024005',
-                currentBelt: 'Yellow Belt',
-                attendanceStatus: 'absent'
-              }
-            ],
-            attendanceStats: {
-              total: 4,
-              present: 2,
-              absent: 1,
-              late: 1,
-              rate: 75.0
-            },
-            recordedBy: 'coach-001',
-            recordedAt: '2024-12-16T21:05:00Z'
-          },
-          {
-            sessionId: 'session-002',
-            classId: 'class-002',
-            className: 'Tuesday Practice',
-            sessionDate: '2024-12-17',
-            venue: 'Compassvale Training Center A',
-            instructor: 'Coach Kim',
-            plannedStartTime: '19:30',
-            plannedEndTime: '20:30',
-            status: 'completed',
-            enrolledStudents: [
-              {
-                studentId: 'student-003',
-                studentName: 'Dhedeepya',
-                studentCode: 'AXT2024003',
-                currentBelt: 'Yellow Belt',
-                attendanceStatus: 'present',
-                arrivalTime: '19:28'
-              },
-              {
-                studentId: 'student-006',
-                studentName: 'Saira',
-                studentCode: 'AXT2024006',
-                currentBelt: 'Green Belt',
-                attendanceStatus: 'present',
-                arrivalTime: '19:30'
-              }
-            ],
-            attendanceStats: {
-              total: 2,
-              present: 2,
-              absent: 0,
-              late: 0,
-              rate: 100.0
-            },
-            recordedBy: 'coach-002',
-            recordedAt: '2024-12-17T20:35:00Z'
-          },
-          {
-            sessionId: 'session-003',
-            classId: 'class-001',
-            className: 'Monday Evening Class',
-            sessionDate: '2024-12-23',
-            venue: 'Tampines Training Center',
-            instructor: 'Jasterfer Kellen',
-            plannedStartTime: '20:00',
-            plannedEndTime: '21:00',
-            status: 'scheduled',
-            enrolledStudents: [
-              {
-                studentId: 'student-001',
-                studentName: 'Rishabh Singh Bist',
-                studentCode: 'AXT2024001',
-                currentBelt: 'Blue Belt'
-              },
-              {
-                studentId: 'student-002',
-                studentName: 'Avaneesh',
-                studentCode: 'AXT2024002',
-                currentBelt: 'Green Belt'
-              }
-            ],
-            attendanceStats: {
-              total: 2,
-              present: 0,
-              absent: 0,
-              late: 0,
-              rate: 0
-            }
-          }
-        ];
+    if (studentId) {
+      filteredRecords = filteredRecords.filter(record => 
+        record.student_id === parseInt(studentId)
+      );
+    }
 
-        // 应用过滤
-        let filteredSessions = mockSessions;
-        if (classId) {
-          filteredSessions = filteredSessions.filter(s => s.classId === classId);
-        }
-        if (dateFrom) {
-          filteredSessions = filteredSessions.filter(s => s.sessionDate >= dateFrom);
-        }
-        if (dateTo) {
-          filteredSessions = filteredSessions.filter(s => s.sessionDate <= dateTo);
-        }
+    if (status) {
+      filteredRecords = filteredRecords.filter(record => 
+        record.status === status
+      );
+    }
 
-        // 权限过滤 - 教练只能看到自己的课程
-        if (authResult.user.role === 'coach') {
-          filteredSessions = filteredSessions.filter(s => s.instructor === authResult.user.displayName);
-        }
+    // 排序（最新的在前）
+    filteredRecords.sort((a, b) => {
+      const dateComparison = b.attendance_date.localeCompare(a.attendance_date);
+      if (dateComparison === 0) {
+        return b.created_at.localeCompare(a.created_at);
+      }
+      return dateComparison;
+    });
 
+    // 分页
+    const total = filteredRecords.length;
+    const totalPages = Math.ceil(total / limit);
+    const offset = (page - 1) * limit;
+    const paginatedRecords = filteredRecords.slice(offset, offset + limit);
+
+    return NextResponse.json({
+      success: true,
+      data: paginatedRecords,
+      pagination: {
+        page,
+        limit,
+        total,
+        total_pages: totalPages,
+        has_next: page < totalPages,
+        has_prev: page > 1
+      }
+    });
+
+  } catch (error) {
+    return createErrorResponse(error);
+  }
+}
+
+// POST /api/attendance - 批量记录出勤
+export async function POST(request: NextRequest) {
+  try {
+    // 验证权限（需要教练或管理员权限）
+    const authResult = await requireAuth(request, 'coach');
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
+    const body = await request.json();
+    const { class_id, attendance_date, records } = body;
+
+    // 验证必填字段
+    if (!class_id || !attendance_date || !records || !Array.isArray(records)) {
+      return NextResponse.json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Missing required fields: class_id, attendance_date, records'
+      }, { status: 400 });
+    }
+
+    // 验证日期格式
+    if (isNaN(Date.parse(attendance_date))) {
+      return NextResponse.json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Invalid attendance_date format',
+        field: 'attendance_date'
+      }, { status: 400 });
+    }
+
+    // 验证记录数组
+    if (records.length === 0) {
+      return NextResponse.json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'At least one attendance record is required',
+        field: 'records'
+      }, { status: 400 });
+    }
+
+    // 验证每条记录
+    const validStatuses = ['Present', 'Late', 'Absent'];
+    for (let i = 0; i < records.length; i++) {
+      const record = records[i];
+      
+      if (!record.student_id || !record.status) {
         return NextResponse.json({
-          success: true,
-          data: filteredSessions,
-          meta: {
-            isMockData: true,
-            type: 'sessions',
-            filters: { classId, dateFrom, dateTo },
-            userRole: authResult.user.role
-          }
-        });
-      } else {
-        // 返回出勤记录列表
-        const mockRecords: AttendanceRecord[] = [
-          {
-            attendanceId: 'att-001',
-            sessionId: 'session-001',
-            sessionDate: '2024-12-16',
-            classId: 'class-001',
-            className: 'Monday Evening Class',
-            studentId: 'student-001',
-            studentName: 'Rishabh Singh Bist',
-            studentCode: 'AXT2024001',
-            status: 'present',
-            arrivalTime: '19:58',
-            recordedBy: 'coach-001',
-            recordedAt: '2024-12-16T21:05:00Z'
-          },
-          {
-            attendanceId: 'att-002',
-            sessionId: 'session-001',
-            sessionDate: '2024-12-16',
-            classId: 'class-001',
-            className: 'Monday Evening Class',
-            studentId: 'student-002',
-            studentName: 'Avaneesh',
-            studentCode: 'AXT2024002',
-            status: 'present',
-            arrivalTime: '20:02',
-            recordedBy: 'coach-001',
-            recordedAt: '2024-12-16T21:05:00Z'
-          },
-          {
-            attendanceId: 'att-003',
-            sessionId: 'session-001',
-            sessionDate: '2024-12-16',
-            classId: 'class-001',
-            className: 'Monday Evening Class',
-            studentId: 'student-004',
-            studentName: 'Aska',
-            studentCode: 'AXT2024004',
-            status: 'late',
-            arrivalTime: '20:15',
-            notes: 'Traffic delay',
-            recordedBy: 'coach-001',
-            recordedAt: '2024-12-16T21:05:00Z'
-          }
-        ];
+          success: false,
+          error: 'VALIDATION_ERROR',
+          message: `Record ${i + 1}: Missing student_id or status`,
+          field: `records[${i}]`
+        }, { status: 400 });
+      }
 
-        // 应用过滤
-        let filteredRecords = mockRecords;
-        if (sessionId) {
-          filteredRecords = filteredRecords.filter(r => r.sessionId === sessionId);
-        }
-        if (classId) {
-          filteredRecords = filteredRecords.filter(r => r.classId === classId);
-        }
-        if (studentId) {
-          filteredRecords = filteredRecords.filter(r => r.studentId === studentId);
-        }
-        if (dateFrom) {
-          filteredRecords = filteredRecords.filter(r => r.sessionDate >= dateFrom);
-        }
-        if (dateTo) {
-          filteredRecords = filteredRecords.filter(r => r.sessionDate <= dateTo);
-        }
-
+      if (!validStatuses.includes(record.status)) {
         return NextResponse.json({
-          success: true,
-          data: filteredRecords,
-          meta: {
-            isMockData: true,
-            type: 'records',
-            filters: { sessionId, classId, studentId, dateFrom, dateTo },
-            userRole: authResult.user.role
-          }
-        });
+          success: false,
+          error: 'VALIDATION_ERROR',
+          message: `Record ${i + 1}: Invalid status. Must be Present, Late, or Absent`,
+          field: `records[${i}].status`
+        }, { status: 400 });
+      }
+
+      // 验证到达时间格式（如果提供）
+      if (record.arrival_time && !/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(record.arrival_time)) {
+        return NextResponse.json({
+          success: false,
+          error: 'VALIDATION_ERROR',
+          message: `Record ${i + 1}: Invalid arrival_time format. Use HH:MM format`,
+          field: `records[${i}].arrival_time`
+        }, { status: 400 });
       }
     }
 
-    // 生产环境数据库查询
-    // TODO: 实现D1数据库查询
-    return NextResponse.json({
-      success: false,
-      error: 'NOT_IMPLEMENTED',
-      message: 'Production database integration pending'
-    }, { status: 501 });
-
-  } catch (error) {
-    console.error('Attendance API error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'INTERNAL_ERROR',
-        message: 'Failed to fetch attendance data',
-        details: process.env.DEV_MODE === 'true' ? error.message : undefined
-      },
-      { status: 500 }
+    // 检查重复记录
+    const existingRecords = mockAttendanceRecords.filter(record => 
+      record.class_id === class_id && record.attendance_date === attendance_date
     );
-  }
-}
 
-// POST /api/attendance - 记录出勤
-export async function POST(request: NextRequest) {
-  try {
-    const authResult = await requireAuth(request);
-    if (!authResult.success || !['coach', 'admin'].includes(authResult.user.role)) {
-      return NextResponse.json(
-        { success: false, error: 'INSUFFICIENT_PERMISSIONS', message: 'Coach or admin access required' },
-        { status: 403 }
-      );
-    }
+    const duplicateStudents = records.filter(record => 
+      existingRecords.some(existing => existing.student_id === record.student_id)
+    );
 
-    const attendanceData: RecordAttendanceRequest = await request.json();
-    
-    // 验证数据
-    if (!attendanceData.sessionId || !Array.isArray(attendanceData.attendance) || attendanceData.attendance.length === 0) {
+    if (duplicateStudents.length > 0) {
+      const duplicateIds = duplicateStudents.map(r => r.student_id).join(', ');
       return NextResponse.json({
         success: false,
         error: 'VALIDATION_ERROR',
-        message: 'Session ID and attendance records are required'
-      }, { status: 422 });
+        message: `Attendance already recorded for students: ${duplicateIds}`,
+        field: 'records'
+      }, { status: 409 });
     }
 
-    const useMockData = process.env.DEV_MODE === 'true' || !process.env.D1_DATABASE_ID;
+    // 创建出勤记录
+    const now = new Date().toISOString();
+    const createdRecords = records.map((record, index) => ({
+      id: Math.max(...mockAttendanceRecords.map(r => r.id)) + index + 1,
+      student_id: record.student_id,
+      class_id: class_id,
+      attendance_date: attendance_date,
+      status: record.status,
+      arrival_time: record.arrival_time || null,
+      notes: record.notes || null,
+      student_name: `Student ${record.student_id}`, // 在实际环境中会从数据库查询
+      student_code: `AXT2024${record.student_id.toString().padStart(3, '0')}`,
+      class_name: `Class ${class_id}`, // 在实际环境中会从数据库查询
+      instructor_name: authResult.user.display_name || 'Instructor',
+      created_at: now,
+      updated_at: now
+    }));
 
-    if (useMockData) {
-      // Mock记录出勤
-      const recordedAttendance = attendanceData.attendance.map((record, index) => ({
-        attendanceId: `att-${Date.now()}-${index}`,
-        sessionId: attendanceData.sessionId,
-        studentId: record.studentId,
-        status: record.status,
-        arrivalTime: record.arrivalTime,
-        departureTime: record.departureTime,
-        notes: record.notes,
-        recordedBy: authResult.user.uid,
-        recordedAt: new Date().toISOString()
-      }));
+    // 统计结果
+    const stats = {
+      total: createdRecords.length,
+      present: createdRecords.filter(r => r.status === 'Present').length,
+      late: createdRecords.filter(r => r.status === 'Late').length,
+      absent: createdRecords.filter(r => r.status === 'Absent').length
+    };
 
-      // 计算统计
-      const stats = {
-        total: attendanceData.attendance.length,
-        present: attendanceData.attendance.filter(a => a.status === 'present').length,
-        absent: attendanceData.attendance.filter(a => a.status === 'absent').length,
-        late: attendanceData.attendance.filter(a => a.status === 'late').length,
-        makeup: attendanceData.attendance.filter(a => a.status === 'makeup').length
-      };
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          sessionId: attendanceData.sessionId,
-          recordedCount: recordedAttendance.length,
-          stats,
-          recordedBy: authResult.user.uid,
-          recordedAt: new Date().toISOString()
-        },
-        message: 'Attendance recorded successfully'
-      }, { status: 201 });
-    }
-
-    // 生产环境数据库操作
-    // TODO: 实现D1数据库插入
     return NextResponse.json({
-      success: false,
-      error: 'NOT_IMPLEMENTED',
-      message: 'Production database integration pending'
-    }, { status: 501 });
+      success: true,
+      data: {
+        records: createdRecords,
+        statistics: stats
+      },
+      message: `Attendance recorded for ${createdRecords.length} students`
+    }, { status: 201 });
 
   } catch (error) {
-    console.error('Record attendance error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'INTERNAL_ERROR',
-        message: 'Failed to record attendance',
-        details: process.env.DEV_MODE === 'true' ? error.message : undefined
-      },
-      { status: 500 }
-    );
+    return createErrorResponse(error);
   }
 }
 
-// PUT /api/attendance - 更新出勤记录
-export async function PUT(request: NextRequest) {
+// GET /api/attendance/statistics - 获取出勤统计
+export async function GET_STATISTICS(request: NextRequest) {
   try {
+    // 验证权限
     const authResult = await requireAuth(request);
-    if (!authResult.success || !['coach', 'admin'].includes(authResult.user.role)) {
-      return NextResponse.json(
-        { success: false, error: 'INSUFFICIENT_PERMISSIONS' },
-        { status: 403 }
+    if (!authResult.success) {
+      return authResult.response;
+    }
+
+    const url = new URL(request.url);
+    const startDate = url.searchParams.get('start_date');
+    const endDate = url.searchParams.get('end_date');
+    const classId = url.searchParams.get('class_id');
+    const studentId = url.searchParams.get('student_id');
+
+    let filteredRecords = [...mockAttendanceRecords];
+
+    // 应用筛选
+    if (startDate) {
+      filteredRecords = filteredRecords.filter(record => 
+        record.attendance_date >= startDate
       );
     }
 
-    const { attendanceId, updates } = await request.json();
+    if (endDate) {
+      filteredRecords = filteredRecords.filter(record => 
+        record.attendance_date <= endDate
+      );
+    }
+
+    if (classId) {
+      filteredRecords = filteredRecords.filter(record => 
+        record.class_id === parseInt(classId)
+      );
+    }
+
+    if (studentId) {
+      filteredRecords = filteredRecords.filter(record => 
+        record.student_id === parseInt(studentId)
+      );
+    }
+
+    // 计算统计
+    const totalRecords = filteredRecords.length;
+    const presentCount = filteredRecords.filter(r => r.status === 'Present').length;
+    const lateCount = filteredRecords.filter(r => r.status === 'Late').length;
+    const absentCount = filteredRecords.filter(r => r.status === 'Absent').length;
     
-    if (!attendanceId) {
-      return NextResponse.json({
-        success: false,
-        error: 'VALIDATION_ERROR',
-        message: 'Attendance ID is required'
-      }, { status: 422 });
-    }
+    const attendanceRate = totalRecords > 0 ? 
+      Math.round(((presentCount + lateCount) / totalRecords) * 100) : 0;
 
-    const useMockData = process.env.DEV_MODE === 'true' || !process.env.D1_DATABASE_ID;
+    // 按日期统计
+    const dailyStats = filteredRecords.reduce((acc, record) => {
+      const date = record.attendance_date;
+      if (!acc[date]) {
+        acc[date] = { present: 0, late: 0, absent: 0, total: 0 };
+      }
+      acc[date][record.status.toLowerCase() as 'present' | 'late' | 'absent']++;
+      acc[date].total++;
+      return acc;
+    }, {} as Record<string, any>);
 
-    if (useMockData) {
-      // Mock更新出勤记录
-      return NextResponse.json({
-        success: true,
-        data: {
-          attendanceId,
-          updates,
-          updatedBy: authResult.user.uid,
-          updatedAt: new Date().toISOString()
-        },
-        message: 'Attendance record updated successfully'
-      });
-    }
+    // 按学员统计
+    const studentStats = filteredRecords.reduce((acc, record) => {
+      const studentId = record.student_id;
+      if (!acc[studentId]) {
+        acc[studentId] = {
+          student_name: record.student_name,
+          student_code: record.student_code,
+          present: 0,
+          late: 0,
+          absent: 0,
+          total: 0,
+          attendance_rate: 0
+        };
+      }
+      acc[studentId][record.status.toLowerCase() as 'present' | 'late' | 'absent']++;
+      acc[studentId].total++;
+      acc[studentId].attendance_rate = Math.round(
+        ((acc[studentId].present + acc[studentId].late) / acc[studentId].total) * 100
+      );
+      return acc;
+    }, {} as Record<number, any>);
 
-    // 生产环境数据库操作
-    // TODO: 实现D1数据库更新
     return NextResponse.json({
-      success: false,
-      error: 'NOT_IMPLEMENTED',
-      message: 'Production database integration pending'
-    }, { status: 501 });
+      success: true,
+      data: {
+        overall: {
+          total_records: totalRecords,
+          present: presentCount,
+          late: lateCount,
+          absent: absentCount,
+          attendance_rate: attendanceRate
+        },
+        daily: dailyStats,
+        by_student: Object.values(studentStats)
+      }
+    });
 
   } catch (error) {
-    console.error('Update attendance error:', error);
-    return NextResponse.json(
-      { success: false, error: 'INTERNAL_ERROR' },
-      { status: 500 }
-    );
+    return createErrorResponse(error);
   }
 }

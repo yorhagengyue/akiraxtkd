@@ -1,11 +1,64 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ClassesSection from '@/components/ClassesSection'
 import AnimatedPage from '@/components/animations/AnimatedPage'
 import ScrollReveal from '@/components/animations/ScrollReveal'
 import { Calendar, Clock, MapPin, Users, Star, Award, Target } from 'lucide-react'
+import { useToast } from '@/components/ui/Toast'
 
 export default function ClassesPage() {
+  const router = useRouter();
+  const { success, error } = useToast();
+  const [user, setUser] = useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // 检查登录状态
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { isAuthenticated: checkAuthStatus, getStoredUser } = await import('@/lib/auth-client');
+        if (checkAuthStatus()) {
+          const userData = getStoredUser();
+          setUser(userData);
+          setIsAuthenticated(true);
+        }
+      } catch (err) {
+        console.error('Auth check error:', err);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // 处理课程报名
+  const handleRegisterClass = async (classData: any) => {
+    if (!isAuthenticated) {
+      // 未登录，重定向到登录页
+      router.push(`/login?next=/classes&class=${encodeURIComponent(classData.day.toLowerCase().replace(/\s+/g, '-'))}`);
+      return;
+    }
+
+    if (user?.role !== 'student') {
+      error('Access Denied', 'Only students can register for classes');
+      return;
+    }
+
+    // 已登录学生，显示报名确认
+    if (confirm(`Register for ${classData.day} class?\n\nTime: ${classData.time}\nLocation: ${classData.location}`)) {
+      try {
+        // TODO: 调用报名API
+        // const response = await classesApi.enroll(classId, { student_id: user.id });
+        success('Registration Successful', `You have been registered for ${classData.day} class!`);
+      } catch (err) {
+        error('Registration Failed', 'Unable to register for class. Please try again.');
+      }
+    }
+  };
+
   const scheduleDetails = [
     {
       day: "Monday",
@@ -64,7 +117,7 @@ export default function ClassesPage() {
   ];
 
   return (
-    <AnimatedPage showBeltProgress={true} beltColor="accent">
+    <AnimatedPage showBeltProgress={true} beltColor="green">
       <Header />
       
       <main className="min-h-screen">
@@ -169,8 +222,11 @@ export default function ClassesPage() {
                       </div>
                       
                       <div className="mt-6 pt-4 border-t border-gray-100">
-                        <button className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-6 py-2 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg">
-                          Register for This Class
+                        <button 
+                          onClick={() => handleRegisterClass(session)}
+                          className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-6 py-2 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg"
+                        >
+                          {isAuthenticated ? 'Register for This Class' : 'Sign In to Register'}
                         </button>
                       </div>
                     </div>

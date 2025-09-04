@@ -22,8 +22,9 @@ import {
 } from 'lucide-react';
 import AnimatedPage from '@/components/animations/AnimatedPage';
 import ScrollReveal from '@/components/animations/ScrollReveal';
-import { useToast } from '@/components/animations/Toast';
+import { useToast } from '@/components/ui/Toast';
 import RouteProtection from '@/lib/route-protection';
+import { dashboardApi } from '@/lib/api-client';
 
 // 简化的数据类型
 interface StudentDashboardData {
@@ -35,15 +36,15 @@ interface StudentDashboardData {
     joinedDate: string;
   };
   upcomingClasses: Array<{
-    className: string;
-    date: string;
-    time: string;
+  className: string;
+  date: string;
+  time: string;
     venue: string;
-    instructor: string;
+  instructor: string;
   }>;
   attendanceRecord: Array<{
     date: string;
-    className: string;
+  className: string;
     status: 'present' | 'absent' | 'late';
   }>;
   beltProgress: {
@@ -52,8 +53,8 @@ interface StudentDashboardData {
     progress: number;
   };
   announcements: Array<{
-    title: string;
-    content: string;
+  title: string;
+  content: string;
     date: string;
     priority: 'low' | 'medium' | 'high';
   }>;
@@ -73,8 +74,14 @@ function StudentDashboardContent() {
     try {
       setLoading(true);
       
-      // 使用简化的Mock数据
-      const mockData: StudentDashboardData = {
+      // 尝试从API加载真实数据
+      const response = await dashboardApi.student.getOverview();
+      
+      if (response.success && response.data) {
+        setData(response.data);
+      } else {
+        // 如果API失败，使用Mock数据作为备用
+        const mockData: StudentDashboardData = {
         profile: {
           name: 'Demo Student',
           studentCode: 'AXT2024001',
@@ -125,7 +132,9 @@ function StudentDashboardContent() {
         ]
       };
 
-      setData(mockData);
+        setData(mockData);
+      }
+      
       setLoading(false);
       
     } catch (err) {
@@ -222,7 +231,7 @@ function StudentDashboardContent() {
                   <p className="text-gray-600">Welcome back, {data.profile.name}</p>
                 </div>
               </div>
-              <button
+              <button 
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-red-600 transition-colors"
               >
@@ -238,7 +247,7 @@ function StudentDashboardContent() {
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Profile Summary */}
-              <ScrollReveal>
+          <ScrollReveal>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                   <div className="flex items-center gap-4 mb-6">
                     <User className="w-8 h-8 text-primary-600" />
@@ -261,8 +270,8 @@ function StudentDashboardContent() {
                             ></div>
                             <span className="text-gray-900 font-medium">{data.profile.currentBelt}</span>
                           </div>
-                        </div>
-                        <div>
+              </div>
+              <div>
                           <label className="text-sm font-medium text-gray-500">Joined Date</label>
                           <p className="text-gray-900">{new Date(data.profile.joinedDate).toLocaleDateString()}</p>
                         </div>
@@ -400,12 +409,12 @@ function StudentDashboardContent() {
                         ></div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </ScrollReveal>
+              </div>
+            </div>
+          </ScrollReveal>
 
               {/* Quick Stats */}
-              <ScrollReveal>
+          <ScrollReveal>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Stats</h3>
                   
@@ -435,10 +444,10 @@ function StudentDashboardContent() {
                     </div>
                   </div>
                 </div>
-              </ScrollReveal>
+          </ScrollReveal>
 
               {/* Announcements */}
-              <ScrollReveal>
+          <ScrollReveal>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                   <div className="flex items-center gap-4 mb-4">
                     <Bell className="w-6 h-6 text-accent-600" />
@@ -454,11 +463,11 @@ function StudentDashboardContent() {
                       </div>
                     ))}
                   </div>
-                </div>
-              </ScrollReveal>
+            </div>
+          </ScrollReveal>
 
               {/* Contact Information */}
-              <ScrollReveal>
+          <ScrollReveal>
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Need Help?</h3>
                   
@@ -495,17 +504,17 @@ function StudentDashboardContent() {
                     >
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                         <span className="text-blue-600 text-sm">✉️</span>
-                      </div>
-                      <div>
+              </div>
+              <div>
                         <p className="font-medium text-gray-900">Email</p>
                         <p className="text-sm text-gray-600">Send message</p>
                       </div>
                     </a>
-                  </div>
-                </div>
-              </ScrollReveal>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
+        </div>
+      </div>
         </div>
       </main>
     </AnimatedPage>

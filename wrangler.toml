@@ -22,6 +22,12 @@ binding = "DB"
 database_name = "akiraxtkd-db-dev"
 database_id = "b1522b79-7afc-48f6-aea1-956e2da145cb"
 
+# Test database
+[[d1_databases]]
+binding = "TEST_DB"
+database_name = "akiraxtkd-test-db"
+database_id = "a8666a18-6f57-4736-90e3-3ffb5210cc41"
+
 # Development environment
 [env.development]
 compatibility_flags = ["nodejs_compat"]

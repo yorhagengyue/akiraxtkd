@@ -9,7 +9,7 @@ import { Award, Users, MapPin, Clock, Phone, Mail } from 'lucide-react'
 
 export default function AboutPage() {
   return (
-    <AnimatedPage showBeltProgress={true} beltColor="primary">
+    <AnimatedPage showBeltProgress={true} beltColor="blue">
       <Header />
       
       <main className="min-h-screen">
@@ -139,9 +139,9 @@ export default function AboutPage() {
                     </div>
                     
                     <div className="mt-6 pt-4 border-t border-gray-100">
-                      <button className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-2 px-4 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg">
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`} target="_blank" rel="noopener noreferrer" className="block w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-2 px-4 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg text-center">
                         Get Directions
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -158,10 +158,10 @@ export default function AboutPage() {
                   Contact us to schedule a visit or trial class at any of our centers.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <a href="tel:+6587668794" className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                    Call Us: +65 8766 8794
+                  <a href="https://wa.me/6587668794?text=Hi%2C%20I%20would%20like%20to%20schedule%20a%20trial%20class" target="_blank" rel="noopener noreferrer" className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors text-center">
+                    Schedule Trial Class
                   </a>
-                  <a href="mailto:teamakiraxtaekwondo@gmail.com" className="border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                  <a href="mailto:teamakiraxtaekwondo@gmail.com?subject=Training%20Enquiry" className="border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-6 py-3 rounded-lg font-semibold transition-colors text-center">
                     Email Us
                   </a>
                 </div>
