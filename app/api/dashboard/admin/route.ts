@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 // Admin Dashboard API - 完整的管理员功能
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';

@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 /**
  * Belt Levels API - 腰带等级管理
  * GET /api/belts - 获取所有腰带等级

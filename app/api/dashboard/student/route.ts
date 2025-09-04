@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 // Student Dashboard API - 简化的学生功能
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';

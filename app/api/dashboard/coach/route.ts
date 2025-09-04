@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 // Coach Dashboard API - 教练专用功能
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth-server';
